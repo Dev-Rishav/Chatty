@@ -5,6 +5,7 @@ function App() {
 
   return (
     <><SignIn/>
+    <div className='text-right cursor-pointer'>Hi</div>
     </>
   )
 }
