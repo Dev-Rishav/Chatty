@@ -10,8 +10,8 @@ export default function SignIn() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            News
+          <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
+            Chatty
           </Typography>
         </Toolbar>
       </AppBar>

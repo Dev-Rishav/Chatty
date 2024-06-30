@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import illustration from '../assets/mp.svg'; // Replace with actual path to your illustration
-import { FcGoogle } from 'react-icons/fc'; // Google icon from react-icons
+import illustration from '../assets/mp.svg'; 
+import { FcGoogle } from 'react-icons/fc';
 
 const LoginSignUpPage = () => {
     const [isSignUp, setIsSignUp] = useState(false);
