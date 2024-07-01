@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
 import illustration from '../assets/mp.svg'; 
 import { FcGoogle } from 'react-icons/fc';
+import {GoogleAuthProvider, signInWithPopup} from "firebase/auth"
+import {auth,googleProvider} from "../firebase/setup"
 
 const LoginSignUpPage = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [isPhoneSignIn, setIsPhoneSignIn] = useState(false);
+
+
+    const googleSignIn = async ()=>{
+        try {
+            await signInWithPopup(auth,googleProvider)
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-purple-500">
@@ -13,13 +24,13 @@ const LoginSignUpPage = () => {
                     <h1 className="text-3xl font-bold mb-6 text-gray-900">{isSignUp ? 'Sign Up' : 'Login'}</h1>
                     <button
                         className="w-full bg-white border border-gray-300 text-gray-900 py-3 px-6 rounded-lg shadow flex items-center justify-center hover:bg-gray-100 transition duration-300 mb-6"
-                        onClick={() => { /* Add Google login logic here */ }}
+                        onClick={googleSignIn}
                     >
                         <FcGoogle className="mr-2" /> {isSignUp ? 'Sign Up' : 'Login'} with Google
                     </button>
                     <button
                         className="w-full bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600 transition duration-300 mb-6"
-                        onClick={() => setIsPhoneSignIn(true)}
+                        onClick={() => setIsPhoneSignIn(true)}//TODO bind phone number login logic
                     >
                         {isSignUp ? 'Sign Up' : 'Login'} with Phone Number
                     </button>
