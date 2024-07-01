@@ -3,7 +3,7 @@ import illustration from '../assets/mp.svg';
 import { FcGoogle } from 'react-icons/fc';
 import {GoogleAuthProvider, signInWithPopup} from "firebase/auth"
 import {auth,database,googleProvider} from "../firebase/setup"
-import { addDoc, doc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 
 const LoginSignUpPage = () => {
     const [isSignUp, setIsSignUp] = useState(false);
@@ -13,7 +13,7 @@ const LoginSignUpPage = () => {
     const addUser=async () => {
         const  userDoc = doc(database,"Users",`${auth.currentUser?.uid}`)
         try {
-            await addDoc(userDoc,{
+            await setDoc(userDoc,{
                 id:auth.currentUser?.uid,
                 username:auth.currentUser?.displayName,
                 profileImg:auth.currentUser?.photoURL
