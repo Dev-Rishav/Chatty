@@ -2,20 +2,39 @@ import React, { useState } from 'react';
 import illustration from '../assets/mp.svg'; 
 import { FcGoogle } from 'react-icons/fc';
 import {GoogleAuthProvider, signInWithPopup} from "firebase/auth"
-import {auth,googleProvider} from "../firebase/setup"
+import {auth,database,googleProvider} from "../firebase/setup"
+import { addDoc, doc } from 'firebase/firestore';
 
 const LoginSignUpPage = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [isPhoneSignIn, setIsPhoneSignIn] = useState(false);
 
 
-    const googleSignIn = async ()=>{
+    const addUser=async () => {
+        const  userDoc = doc(database,"Users",`${auth.currentUser?.uid}`)
         try {
-            await signInWithPopup(auth,googleProvider)
+            await addDoc(userDoc,{
+                id:auth.currentUser?.uid,
+                username:auth.currentUser?.displayName,
+                profileImg:auth.currentUser?.photoURL
+            })
         } catch (error) {
             console.log(error);
         }
     }
+
+
+    const googleSignIn = async ()=>{
+        try {
+            await signInWithPopup(auth,googleProvider)
+            addUser()
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+    console.log(auth);  //TODO
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-purple-500">
