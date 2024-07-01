@@ -4,7 +4,7 @@ import React from 'react'
 const Sidebar = () => {
   return (
     <div>
-        <Paper>
+        <Paper elevation={0} sx={{border:"1px solid #D4D4D4"}}>
             <List>
                 <ListItem>
                     <Avatar/>
