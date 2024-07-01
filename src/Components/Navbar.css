@@ -1,3 +1,5 @@
 .profile-img {
-    margin-top:2px;
+    margin-bottom:-2px;
+    border-radius: 50px;
+    width: 40px;
 }

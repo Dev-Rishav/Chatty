@@ -11,7 +11,7 @@ export default function Navbar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar elevation={0} sx={{backgroundColor:"#A855F7",height:"50px"}} position="static">
         <Toolbar variant="dense">
-            <Avatar className='profile-img' src={auth.currentUser?.photoURL}></Avatar>
+            <img referrerPolicy='no-referrer' className='profile-img' src={auth.currentUser?.photoURL}></img>
         </Toolbar>
       </AppBar>
     </Box>
