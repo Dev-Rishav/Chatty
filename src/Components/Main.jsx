@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid } from '@mui/material';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+import "./Main.css";
 
 const Main = () => {
   return (
