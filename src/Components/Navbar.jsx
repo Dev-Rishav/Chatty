@@ -12,6 +12,7 @@ export default function Navbar() {
       <AppBar elevation={0} sx={{backgroundColor:"#A855F7",height:"50px"}} position="static">
         <Toolbar variant="dense">
             <img referrerPolicy='no-referrer' className='profile-img' src={auth.currentUser?.photoURL}></img>
+            {/* TODO: on reload the profile picture does not shows up */}
         </Toolbar>
       </AppBar>
     </Box>
