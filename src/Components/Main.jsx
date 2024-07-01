@@ -14,7 +14,7 @@ const Main = () => {
                 <Sidebar/>
             </Grid>
             <Grid xs={7}>
-                <div>
+                <div className='main-right'>
                     hello
                 </div>
             </Grid>

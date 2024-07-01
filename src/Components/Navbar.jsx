@@ -1,9 +1,19 @@
-import React from 'react'
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import { Avatar } from '@mui/material';
+import { auth } from '../firebase/setup';
+import "./Navbar.css"
 
-const Navbar = () => {
+export default function Navbar() {
   return (
-    <div>Navbar</div>
-  )
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar elevation={0} sx={{backgroundColor:"#A855F7",height:"50px"}} position="static">
+        <Toolbar variant="dense">
+            <Avatar className='profile-img' src={auth.currentUser?.photoURL}></Avatar>
+        </Toolbar>
+      </AppBar>
+    </Box>
+  );
 }
-
-export default Navbar
