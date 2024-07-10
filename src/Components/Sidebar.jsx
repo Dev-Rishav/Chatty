@@ -1,7 +1,8 @@
 import { Paper, Avatar, List, ListItem, ListItemText } from '@mui/material'
 import { collection, getDocs } from 'firebase/firestore'
 import React, { useEffect, useState } from 'react'
-import { database } from '../firebase/setup'
+import { database,auth } from '../firebase/setup'
+
 
 const Sidebar = () => {
 
@@ -26,21 +27,21 @@ const Sidebar = () => {
 
   }
 
-  //todo add filter function so that the current user  does not shows up 
+  //todo[DONE]: add filter function so that the current user  does not shows up 
 
   useEffect(() => { getUser() }, [users])
 
-// console.log(users);
+  // console.log(users);
 
   return (
     <div>
-      {users.map((user) => {    
+      {users.filter(user => user.id !== auth.currentUser?.uid).map((user) => {
         return <>
           <Paper elevation={0} sx={{ border: "1px solid #D4D4D4" }}>
             <List>
               <ListItem>
                 <Avatar src={user.profileImg} />
-                <ListItemText primary={user.username}/>
+                <ListItemText primary={user.username} />
               </ListItem>
             </List>
           </Paper>
