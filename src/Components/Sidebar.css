@@ -18,3 +18,7 @@
     width: 25px;
     margin-left: 25px;
 }
+
+.chat-link{
+    text-decoration: none;
+}

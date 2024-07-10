@@ -1,8 +1,9 @@
-import { Route,Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import Header from './Components/Header'
 import LoginSignUpPage from './Components/LoginSignupPage'
 import Main from './Components/Main'
+import Chat from './Components/Chat'
 
 function App() {
 
@@ -10,8 +11,9 @@ function App() {
     <div>
       {/* <Header/> */}
       <Routes>
-        <Route path='/' element={<LoginSignUpPage/>}/>
-        <Route path='/Main' element={<Main/>}/>
+        <Route path='/' element={<LoginSignUpPage />} />
+        <Route path='/Main' element={<Main />} />
+        <Route path='/Chat' element={<Chat />} />
       </Routes>
     </div>
   )
