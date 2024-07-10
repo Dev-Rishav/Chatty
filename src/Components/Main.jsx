@@ -11,10 +11,10 @@ const Main = () => {
             <Grid item xs={12}>
                 <Navbar/>
             </Grid>
-            <Grid xs={5}>
+            <Grid item xs={5}>
                 <Sidebar/>
             </Grid>
-            <Grid xs={7}>
+            <Grid item xs={7}>
                 <div className='main-right'>
                     hello
                 </div>
