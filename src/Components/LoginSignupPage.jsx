@@ -4,11 +4,14 @@ import { FcGoogle } from 'react-icons/fc';
 import {GoogleAuthProvider, signInWithPopup} from "firebase/auth"
 import {auth,database,googleProvider} from "../firebase/setup"
 import { doc, setDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 const LoginSignUpPage = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [isPhoneSignIn, setIsPhoneSignIn] = useState(false);
 
+
+    const navigate = useNavigate()
 
     const addUser=async () => {
         const  userDoc = doc(database,"Users",`${auth.currentUser?.uid}`)
@@ -28,6 +31,7 @@ const LoginSignUpPage = () => {
         try {
             await signInWithPopup(auth,googleProvider)
             addUser()
+            navigate("/Main")
         } catch (error) {
             console.log(error);
         }
