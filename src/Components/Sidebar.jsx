@@ -6,8 +6,7 @@ import { database,auth } from '../firebase/setup'
 
 const Sidebar = () => {
 
-
-
+  console.log("hi");
   const [users, setUsers] = useState([])
 
 
@@ -26,11 +25,13 @@ const Sidebar = () => {
 
   }
 
+  //TODO[Done]: is this component stuck in a loop? find out why it repaints multiple times until firebase quota exceeds.
+  //This was happening because of the useEffect hook continuously updating whenever changes performed over users, setting the dependency array empty fixes the issue for now.
+  // useEffect(() => { getUser() }, [users])
+  useEffect( () => {getUser()},[])
+
+
   //todo[DONE]: add filter function so that the current user  does not shows up 
-
-  useEffect(() => { getUser() }, [users])
-
-
   return (
     <div>
       {users.filter(user => user.id !== auth.currentUser?.uid).map((user) => {
