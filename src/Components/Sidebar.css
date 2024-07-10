@@ -1,0 +1,20 @@
+.search{
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #e9e9e9;
+}
+
+.search-field{
+    width:350px;
+    height: 30px;
+    border: 1px solid #e9e9e9;
+    margin-left: 10px;
+    border-radius: 10px;
+    background-color: #e9e9e9;
+}
+
+.search-icon{
+    width: 25px;
+    margin-left: 25px;
+}
