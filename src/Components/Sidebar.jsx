@@ -19,7 +19,6 @@ const Sidebar = () => {
         ...doc.data(),
         id: doc.id
       }))
-      // console.log(filteredData);
       setUsers(filteredData);
     } catch (error) {
       console.log(error);
@@ -31,7 +30,6 @@ const Sidebar = () => {
 
   useEffect(() => { getUser() }, [users])
 
-  // console.log(users);
 
   return (
     <div>
