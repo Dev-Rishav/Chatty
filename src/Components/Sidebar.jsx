@@ -43,7 +43,6 @@ const Sidebar = () => {
         <input className='search-field' placeholder='Search for new chat' />
       </div>
       {users.filter(user => user.id !== auth.currentUser?.uid).map((user) => {
-        console.log("thi ss",user.id);
         return <>
           <Link
             to='/chat'

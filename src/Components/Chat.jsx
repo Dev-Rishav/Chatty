@@ -13,7 +13,7 @@ function Chat() {
     const [msgData,setMsgData]= useState([])
 
     const location = useLocation();
-    console.log(location);
+    // console.log(location);
 
     const sendMsg =  async () => {
         const userDoc = doc(database,"Users",`${location.state.id}`);
@@ -29,7 +29,7 @@ function Chat() {
     }
 
 
-
+    //TODO: showMessage() cant fetch messages from DB.
     const showMessage = async()=> {
         const userDoc = doc(database,"Users",`${auth.currentUser?.uid}`);
         const messageDoc = doc(userDoc,"Message",`${auth.currentUser?.uid}`)
@@ -40,7 +40,7 @@ function Chat() {
                 ...doc.data(),
                 id:doc.id
             }))
-            // console.log(data.docs);
+            console.log(filteredData);
             setMsgData(filteredData);
         } catch (error) {
             console.error(error);
