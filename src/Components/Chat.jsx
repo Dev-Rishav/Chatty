@@ -1,19 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from './Navbar'
 import { useLocation } from 'react-router-dom'
 import "./Chat.css";
 import { LuPaperclip } from "react-icons/lu";
-import { addDoc, collection, doc } from 'firebase/firestore';
-import { database } from '../firebase/setup';
+import { addDoc, collection, doc, getDocs } from 'firebase/firestore';
+import { database,auth} from '../firebase/setup';
 import { IoSendSharp } from "react-icons/io5";
-import { auth } from '../firebase/setup';
 
 function Chat() {
 
     const [msg,setMsg] = useState("")
+    const [msgData,setMsgData]= useState([])
 
     const location = useLocation();
-    // console.log(location);
+    console.log(location);
 
     const sendMsg =  async () => {
         const userDoc = doc(database,"Users",`${location.state.id}`);
@@ -28,6 +28,30 @@ function Chat() {
         }
     }
 
+
+
+    const showMessage = async()=> {
+        const userDoc = doc(database,"Users",`${auth.currentUser?.uid}`);
+        const messageDoc = doc(userDoc,"Message",`${auth.currentUser?.uid}`)
+        const messageRef = collection(messageDoc,`Message-${location.state.id}`)
+        try {
+            const data = await getDocs(messageRef)
+            const  filteredData = data.docs.map((doc) => ({
+                ...doc.data(),
+                id:doc.id
+            }))
+            // console.log(data.docs);
+            setMsgData(filteredData);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect( () => {
+        showMessage()
+    },[])
+
+        // console.log(msgData);
 
     return (
         <div className='chat'>
