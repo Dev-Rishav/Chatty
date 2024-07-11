@@ -1,21 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Navbar from './Navbar'
 import { useLocation } from 'react-router-dom'
 import "./Chat.css";
 import { LuPaperclip } from "react-icons/lu";
-import { addDoc, doc } from 'firebase/firestore';
+import { addDoc, collection, doc } from 'firebase/firestore';
 import { database } from '../firebase/setup';
+import { IoSendSharp } from "react-icons/io5";
+import { auth } from '../firebase/setup';
 
 function Chat() {
 
+    const [msg,setMsg] = useState("")
 
     const location = useLocation();
-    console.log(location);
+    // console.log(location);
 
     const sendMsg =  async () => {
         const userDoc = doc(database,"Users",`${location.state.id}`);
+        const messageDoc = doc(userDoc,"Message",`${location.state.id}`)
+        const messageRef = collection(messageDoc,`Message-${auth.currentUser?.uid}`)
         try {
-            await addDoc()
+            await addDoc(messageRef,{
+            message: msg,
+            })
         } catch (error) {
             console.log(error);
         }
@@ -29,7 +36,8 @@ function Chat() {
             </div>
             <div className='chat-bottom'>
                 <LuPaperclip className='clip-icon'/>
-                <input className='chat-field' placeholder='Type a message'/>
+                <input onChange={(e) => setMsg(e.target.value)} className='chat-field' placeholder='Type a message'/>
+                <IoSendSharp onClick={sendMsg} className='send-icon'/>
             </div>
         </div>
     )
