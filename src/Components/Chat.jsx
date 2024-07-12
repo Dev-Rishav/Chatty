@@ -6,6 +6,7 @@ import { LuPaperclip } from "react-icons/lu";
 import { addDoc, collection, doc, getDocs } from 'firebase/firestore';
 import { database,auth} from '../firebase/setup';
 import { IoSendSharp } from "react-icons/io5";
+import { List, ListItem, ListItemText, Paper } from '@mui/material';
 
 function Chat() {
 
@@ -28,8 +29,8 @@ function Chat() {
         }
     }
 
-
-    //TODO: showMessage() cant fetch messages from DB.
+    // console.log(location.state.id);
+    //TODO [Broken] {Sometimes working}: showMessage() cant fetch messages from DB.
     const showMessage = async()=> {
         const userDoc = doc(database,"Users",`${auth.currentUser?.uid}`);
         const messageDoc = doc(userDoc,"Message",`${auth.currentUser?.uid}`)
@@ -38,9 +39,9 @@ function Chat() {
             const data = await getDocs(messageRef)
             const  filteredData = data.docs.map((doc) => ({
                 ...doc.data(),
-                id:doc.id
+                id:doc.id,
             }))
-            console.log(filteredData);
+            // console.log(filteredData);
             setMsgData(filteredData);
         } catch (error) {
             console.error(error);
@@ -57,6 +58,19 @@ function Chat() {
         <div className='chat'>
             <div className='chat-top'>
                 <Navbar receiverUsername={location.state.username} receiverProfileImg={location.state.profile_image} />
+            </div>
+            <div className='chat-middle'>
+                {msgData.map((data)=>{
+                    return <>
+                    <Paper>
+                        <List>
+                            <ListItem>
+                                <ListItemText primary={data.message}/>
+                            </ListItem>
+                        </List>
+                    </Paper>
+                    </>
+                })}
             </div>
             <div className='chat-bottom'>
                 <LuPaperclip className='clip-icon'/>

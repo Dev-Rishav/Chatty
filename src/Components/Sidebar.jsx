@@ -45,6 +45,7 @@ const Sidebar = () => {
       {users.filter(user => user.id !== auth.currentUser?.uid).map((user) => {
         return <>
           <Link
+          key={user.id}
             to='/chat'
             className='chat-link'
             state={{
