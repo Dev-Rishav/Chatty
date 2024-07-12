@@ -50,4 +50,6 @@
 .chat-middle{
     padding-top: 90px;
     padding-left: 30px;
+    min-height:100vh;
+    height: 100%;
 }
