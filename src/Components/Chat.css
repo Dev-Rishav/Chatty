@@ -53,3 +53,7 @@
     min-height:100vh;
     height: 100%;
 }
+
+.clip-file{
+    display: none;
+}

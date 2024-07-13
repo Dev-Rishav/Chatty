@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import Navbar from './Navbar'
 import { useLocation } from 'react-router-dom'
 import "./Chat.css";
@@ -9,6 +9,8 @@ import { IoSendSharp } from "react-icons/io5";
 import { List, ListItem, ListItemText, Paper } from '@mui/material';
 
 function Chat() {
+
+    const fileRef= useReducer(null);
 
     const [msg, setMsg] = useState("")
     const [msgData, setMsgData] = useState([])
@@ -91,8 +93,8 @@ function Chat() {
                 })}
             </div>
             <div className='chat-bottom'>
-                <LuPaperclip className='clip-icon' />
-                
+                <LuPaperclip className='clip-icon' onClick={() => fileRef.current.click()}/>
+                <input ref={fileRef} type='file' className='clip-file'/>
                 <input onChange={(e) => setMsg(e.target.value)} className='chat-field' placeholder='Type a message' />
                 <IoSendSharp onClick={sendMsg} className='send-icon' />
             </div>
