@@ -14,6 +14,7 @@ function Chat() {
 
     const [msg, setMsg] = useState("")
     const [msgData, setMsgData] = useState([])
+    const [file,setFile]=useState("")
 
     const location = useLocation();
     // console.log(location);
@@ -25,6 +26,7 @@ function Chat() {
         try {
             await addDoc(messageRef, {
                 message: msg,
+                file:file
             })
         } catch (error) {
             console.log(error);
@@ -39,6 +41,7 @@ function Chat() {
         try {
             await addDoc(messageRef, {
                 message: msg,
+                file:file
             })
             addMessage();
         } catch (error) {
@@ -86,6 +89,7 @@ function Chat() {
                             <List>
                                 <ListItem>
                                     <ListItemText primary={data.message} />
+                                    {data.file !== "" && <img src={data.file} className='chat-img' />}
                                 </ListItem>
                             </List>
                         </Paper>
@@ -94,8 +98,11 @@ function Chat() {
             </div>
             <div className='chat-bottom'>
                 <LuPaperclip className='clip-icon' onClick={() => fileRef.current.click()}/>
-                <input ref={fileRef} type='file' className='clip-file'/>
+                <input accept='image/*' onChange={(e) => setFile(URL.createObjectURL(e.target.files[0]))} ref={fileRef} type='file' className='clip-file'/>
                 <input onChange={(e) => setMsg(e.target.value)} className='chat-field' placeholder='Type a message' />
+                <Paper>
+                    <img style={{width:"70px",padding:"3px"}} src={file}/>
+                </Paper>
                 <IoSendSharp onClick={sendMsg} className='send-icon' />
             </div>
         </div>
