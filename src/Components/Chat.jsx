@@ -46,6 +46,7 @@ function Chat() {
                 name:auth.currentUser?.displayName
             })
             addMessage();
+            setFile(""); //set file to empty whenever message is send
         } catch (error) {
             console.log(error);
         }
