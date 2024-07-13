@@ -38,10 +38,12 @@ function Chat() {
         const userDoc = doc(database, "Users", `${location.state.id}`);
         const messageDoc = doc(userDoc, "Message", `${location.state.id}`)
         const messageRef = collection(messageDoc, `Message-${auth.currentUser?.uid}`)
+    
         try {
             await addDoc(messageRef, {
                 message: msg,
-                file:file
+                file:file,
+                name:auth.currentUser?.displayName
             })
             addMessage();
         } catch (error) {
@@ -85,6 +87,7 @@ function Chat() {
             <div className='chat-middle'>
                 {msgData.map((data) => {
                     return <>
+                    <h5 style={{fontWeight:"200px"}}>{data.name}</h5>
                         <Paper sx={{ marginTop: "10px", width: "200px" }}>
                             <List>
                                 <ListItem>
@@ -100,9 +103,9 @@ function Chat() {
                 <LuPaperclip className='clip-icon' onClick={() => fileRef.current.click()}/>
                 <input accept='image/*' onChange={(e) => setFile(URL.createObjectURL(e.target.files[0]))} ref={fileRef} type='file' className='clip-file'/>
                 <input onChange={(e) => setMsg(e.target.value)} className='chat-field' placeholder='Type a message' />
-                <Paper>
+                {file && <Paper>
                     <img style={{width:"70px",padding:"3px"}} src={file}/>
-                </Paper>
+                </Paper>}
                 <IoSendSharp onClick={sendMsg} className='send-icon' />
             </div>
         </div>
