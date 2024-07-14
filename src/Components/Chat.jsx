@@ -1,114 +1,146 @@
-import React, { useEffect, useReducer, useState } from 'react'
-import Navbar from './Navbar'
-import { useLocation } from 'react-router-dom'
-import "./Chat.css"
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { LuPaperclip } from "react-icons/lu";
-import { addDoc, collection, doc, getDocs } from 'firebase/firestore'
-import { auth, database } from '../firebase/setup'
 import { IoSendSharp } from "react-icons/io5";
-import { List, ListItem, ListItemText, Paper } from '@mui/material'
+import { addDoc, collection, query, orderBy, onSnapshot, where, or, and } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, database, storage } from '../firebase/setup';
 
 function Chat() {
-
-    const fileRef = useReducer(null)
-
-    const [message, setMessage] = useState("")
-    const [messageData, setMessageData] = useState([])
-    const [file, setFile] = useState("")
-
-    const location = useLocation()
-
-    const addMessage = async () => {
-        const userDoc = doc(database, "Users", `${auth.currentUser?.uid}`)
-        const messageDoc = doc(userDoc, "Message", `${auth.currentUser?.uid}`)
-        const messageRef = collection(messageDoc, `Message-${location.state.id}`)
-        try {
-            await addDoc(messageRef, {
-                message: message,
-                file: file
-            })
-
-        } catch (error) {
-            console.error(error)
-        }
-    }
-
-    const sendMessage = async () => {
-        const userDoc = doc(database, "Users", `${location.state.id}`)
-        const messageDoc = doc(userDoc, "Message", `${location.state.id}`)
-        const messageRef = collection(messageDoc, `Message-${auth.currentUser?.uid}`)
-        try {
-            await addDoc(messageRef, {
-                message: message,
-                file: file,
-                name: auth.currentUser?.displayName
-            })
-            addMessage()
-            setFile("")
-        } catch (error) {
-            console.error(error)
-        }
-    }
-
-    const showMessage = async () => {
-        const userDoc = doc(database, "Users", `${auth.currentUser?.uid}`)
-        const messageDoc = doc(userDoc, "Message", `${auth.currentUser?.uid}`)
-        const messageRef = collection(messageDoc, `Message-${location.state.id}`)
-        setTimeout(async () => {
-            try {
-                const data = await getDocs(messageRef)
-                const filteredData = data.docs.map((doc) => ({
-                    ...doc.data(),
-                    id: doc.id
-                }))
-                setMessageData(filteredData)
-                console.log(messageData);
-            } catch (error) {
-                console.error(error)
-            }
-        }, 1000)
-    }
-
+    const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState([]);
+    const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const fileRef = useRef(null);
 
     useEffect(() => {
-        showMessage()
-    }, [])
-    console.log(message);
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setLoading(false);
+            } else {
+                navigate('/login');
+            }
+        });
 
+        return () => unsubscribe();
+    }, [navigate]);
+
+    const sendMessage = async () => {
+        if (message.trim() === "" && !file) return;
+
+        try {
+            let fileUrl = "";
+            if (file) {
+                const storageRef = ref(storage, `chat_files/${Date.now()}_${file.name}`);
+                await uploadBytes(storageRef, file);
+                fileUrl = await getDownloadURL(storageRef);
+            }
+
+            const messageData = {
+                message,
+                fileUrl,
+                senderName: auth.currentUser?.displayName,
+                senderId: auth.currentUser?.uid,
+                receiverId: location.state?.id,
+                timestamp: new Date()
+            };
+
+            await addDoc(collection(database, "Messages"), messageData);
+            setMessage("");
+            setFile(null);
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
+    };
+
+    const fetchMessages = useCallback(() => {
+        if (!auth.currentUser || !location.state?.id) {
+            console.log('Missing current user or receiver id');
+            return () => {};
+        }
+
+        const messagesRef = collection(database, "Messages");
+        const q = query(
+            messagesRef,
+            or(
+                and(
+                    where('senderId', '==', auth.currentUser.uid),
+                    where('receiverId', '==', location.state.id)
+                ),
+                and(
+                    where('senderId', '==', location.state.id),
+                    where('receiverId', '==', auth.currentUser.uid)
+                )
+            ),
+            orderBy("timestamp", "asc")
+        );
+
+        return onSnapshot(q, (querySnapshot) => {
+            const fetchedMessages = querySnapshot.docs.map(doc => ({
+                ...doc.data(),
+                id: doc.id
+            }));
+            console.log('Fetched messages:', fetchedMessages);
+            setMessages(fetchedMessages);
+        }, (error) => {
+            console.error("Error fetching messages:", error);
+        });
+    }, [location.state?.id]);
+
+    useEffect(() => {
+        if (!loading && auth.currentUser && location.state?.id) {
+            console.log('Fetching messages for id:', location.state.id);
+            const unsubscribe = fetchMessages();
+            return () => unsubscribe();
+        }
+    }, [loading, location.state, fetchMessages]);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
-        <div className='chat'>
-            <div className='chat-top'>
-                <Navbar receiverUsername={location.state.username}
-                    receiverProImg={location.state.profile_image} />
+        <div className='flex flex-col h-screen'>
+            <div className='bg-gray-800 text-white p-4'>
+                <h1 className='text-xl'>{location.state?.username || "Chat"}</h1>
             </div>
-            <div className='chat-middle'>
-                {messageData.map((data) => {
-                    return <>
-                        <h5 style={{ fontWeight: "200" }}>{data.name}</h5>
-                        <Paper sx={{ marginTop: "10px", width: "max-content" }}>
-                            <List>
-                                <ListItem>
-                                    <ListItemText primary={data.message} />
-                                    {data.file !== "" && <img style={{ width: "200px" }} src={data.file} />}
-                                </ListItem>
-                            </List>
-                        </Paper>
-                    </>
-                })}
+            <div className='flex-1 p-4 overflow-y-auto'>
+                {messages.map((msg) => (
+                    <div key={msg.id} className={`flex ${msg.senderId === auth.currentUser?.uid ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`p-2 m-2 rounded-lg ${msg.senderId === auth.currentUser?.uid ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}>
+                            <p>{msg.senderName}: {msg.message}</p>
+                            {msg.fileUrl && <img src={msg.fileUrl} alt="attachment" className='mt-2 max-w-xs' />}
+                        </div>
+                    </div>
+                ))}
             </div>
-            <div className='chat-bottom'>
-                <LuPaperclip onClick={() => fileRef.current.click()} className='clip-icon' />
-                <input accept='image/*' onChange={(e) => setFile(URL.createObjectURL(e.target.files[0]))} ref={fileRef} type='file' className='clip-file' />
-
-                <input onChange={(e) => setMessage(e.target.value)} className='chat-field' placeholder='Type a message' />
-                {file && <Paper>
-                    <img style={{ width: "70px", padding: "3px" }} src={file} />
-                </Paper>}
-                <IoSendSharp onClick={sendMessage} className='send-icon' />
+            <div className='flex items-center p-4 border-t border-gray-300'>
+                <button onClick={() => fileRef.current.click()} className='p-2'>
+                    <LuPaperclip className='text-2xl text-gray-600' />
+                </button>
+                <input
+                    type='file'
+                    ref={fileRef}
+                    onChange={(e) => setFile(e.target.files[0])}
+                    className='hidden'
+                />
+                <input
+                    type='text'
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className='flex-1 p-2 mx-2 border rounded-lg'
+                    placeholder='Type a message...'
+                />
+                {file && <p className='mx-2'>{file.name}</p>}
+                <button onClick={sendMessage} className='p-2'>
+                    <IoSendSharp className='text-2xl text-blue-500' />
+                </button>
             </div>
         </div>
-    )
+    );
 }
 
-export default Chat
+export default Chat;
