@@ -63,3 +63,12 @@
 .clip-file{
     display: none;
 }
+
+.sender-name{
+    text-align: center;
+    padding: 3px;
+    font-weight: 200px;
+    background-color: violet;
+    width: 200px;
+    font-weight: 500;
+}

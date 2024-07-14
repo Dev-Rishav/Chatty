@@ -1,26 +1,25 @@
 import React, { useEffect, useReducer, useState } from 'react'
 import Navbar from './Navbar'
 import { useLocation } from 'react-router-dom'
-import "./Chat.css";
+import "./Chat.css"
 import { LuPaperclip } from "react-icons/lu";
-import { addDoc, collection, doc, getDocs } from 'firebase/firestore';
-import { database, auth } from '../firebase/setup';
+import { addDoc, collection, doc, getDocs } from 'firebase/firestore'
+import { auth, database } from '../firebase/setup'
 import { IoSendSharp } from "react-icons/io5";
-import { List, ListItem, ListItemText, Paper } from '@mui/material';
+import { List, ListItem, ListItemText, Paper } from '@mui/material'
 
 function Chat() {
 
-    const fileRef = useReducer(null);
+    const fileRef = useReducer(null)
 
     const [message, setMessage] = useState("")
     const [messageData, setMessageData] = useState([])
     const [file, setFile] = useState("")
 
-    const location = useLocation();
-    // console.log(location);
+    const location = useLocation()
 
     const addMessage = async () => {
-        const userDoc = doc(database, "Users", `${auth.currentUser?.uid}`);
+        const userDoc = doc(database, "Users", `${auth.currentUser?.uid}`)
         const messageDoc = doc(userDoc, "Message", `${auth.currentUser?.uid}`)
         const messageRef = collection(messageDoc, `Message-${location.state.id}`)
         try {
@@ -28,36 +27,31 @@ function Chat() {
                 message: message,
                 file: file
             })
-        } catch (error) {
-            console.error(error);
-        }
 
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     const sendMessage = async () => {
-        const userDoc = doc(database, "Users", `${location.state.id}`);
+        const userDoc = doc(database, "Users", `${location.state.id}`)
         const messageDoc = doc(userDoc, "Message", `${location.state.id}`)
         const messageRef = collection(messageDoc, `Message-${auth.currentUser?.uid}`)
-
         try {
             await addDoc(messageRef, {
                 message: message,
                 file: file,
                 name: auth.currentUser?.displayName
             })
-            addMessage();
-            setFile(""); //set file to empty whenever message is send
+            addMessage()
+            setFile("")
         } catch (error) {
-            console.error(error);
+            console.error(error)
         }
     }
 
-    // console.log(location.state.id);
-    //TODO [Broken] {Sometimes working}: showMessage() cant fetch messages from DB.
-    //* A solution found to the above problem: if messageData is passed over the dependency array of the useEffect hook then the message shows up but it falls in an infinite loop resulting in exhausting firebase quota
-
     const showMessage = async () => {
-        const userDoc = doc(database, "Users", `${auth.currentUser?.uid}`);
+        const userDoc = doc(database, "Users", `${auth.currentUser?.uid}`)
         const messageDoc = doc(userDoc, "Message", `${auth.currentUser?.uid}`)
         const messageRef = collection(messageDoc, `Message-${location.state.id}`)
         setTimeout(async () => {
@@ -65,37 +59,38 @@ function Chat() {
                 const data = await getDocs(messageRef)
                 const filteredData = data.docs.map((doc) => ({
                     ...doc.data(),
-                    id: doc.id,
+                    id: doc.id
                 }))
-                // console.log(filteredData);
-                setMessageData(filteredData);
+                setMessageData(filteredData)
+                console.log(messageData);
             } catch (error) {
-                console.error(error);
+                console.error(error)
             }
         }, 1000)
     }
 
-    useEffect(() => {
-        showMessage();
-        // console.log(messageData);
-    }, [])
 
-    console.log(messageData);
+    useEffect(() => {
+        showMessage()
+    }, [])
+    console.log(message);
+
 
     return (
         <div className='chat'>
             <div className='chat-top'>
-                <Navbar receiverUsername={location.state.username} receiverProfileImg={location.state.profile_image} />
+                <Navbar receiverUsername={location.state.username}
+                    receiverProImg={location.state.profile_image} />
             </div>
             <div className='chat-middle'>
                 {messageData.map((data) => {
                     return <>
-                        <h5 style={{ fontWeight: "200px" }}>{data.name}</h5>
-                        <Paper sx={{ marginTop: "10px", width: "200px" }}>
+                        <h5 style={{ fontWeight: "200" }}>{data.name}</h5>
+                        <Paper sx={{ marginTop: "10px", width: "max-content" }}>
                             <List>
                                 <ListItem>
                                     <ListItemText primary={data.message} />
-                                    {data.file !== "" && <img src={data.file} className='chat-img' />}
+                                    {data.file !== "" && <img style={{ width: "200px" }} src={data.file} />}
                                 </ListItem>
                             </List>
                         </Paper>
@@ -103,8 +98,9 @@ function Chat() {
                 })}
             </div>
             <div className='chat-bottom'>
-                <LuPaperclip className='clip-icon' onClick={() => fileRef.current.click()} />
+                <LuPaperclip onClick={() => fileRef.current.click()} className='clip-icon' />
                 <input accept='image/*' onChange={(e) => setFile(URL.createObjectURL(e.target.files[0]))} ref={fileRef} type='file' className='clip-file' />
+
                 <input onChange={(e) => setMessage(e.target.value)} className='chat-field' placeholder='Type a message' />
                 {file && <Paper>
                     <img style={{ width: "70px", padding: "3px" }} src={file} />
@@ -114,6 +110,5 @@ function Chat() {
         </div>
     )
 }
-//TODO find an alternative of input onChange
 
 export default Chat
