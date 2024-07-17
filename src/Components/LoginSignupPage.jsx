@@ -21,6 +21,7 @@ const LoginSignUpPage = () => {
                 username:auth.currentUser?.displayName,
                 profileImg:auth.currentUser?.photoURL
             })
+            console.log("User added");
         } catch (error) {
             console.log(error);
         }
@@ -29,7 +30,9 @@ const LoginSignUpPage = () => {
 
     const googleSignIn = async ()=>{
         try {
+        console.log("here");
             await signInWithPopup(auth,googleProvider)
+            console.log("not on hold");
             addUser()
             navigate("/Main")
         } catch (error) {
