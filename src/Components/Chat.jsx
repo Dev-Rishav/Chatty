@@ -16,12 +16,14 @@ function Chat() {
     const navigate = useNavigate();
     const fileRef = useRef(null);
 
+    // console.log(location.state || {});
+    
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 setLoading(false);
             } else {
-                navigate('/login');
+                navigate('/');
             }
         });
 
@@ -30,6 +32,7 @@ function Chat() {
 
     const sendMessage = async () => {
         if (message.trim() === "" && !file) return;
+        // console.log(message);
 
         try {
             let fileUrl = "";
@@ -47,7 +50,7 @@ function Chat() {
                 receiverId: location.state?.id,
                 timestamp: new Date()
             };
-
+            // console.log(messageData);
             await addDoc(collection(database, "Messages"), messageData);
             setMessage("");
             setFile(null);
@@ -144,5 +147,3 @@ function Chat() {
 }
 
 export default Chat;
-
-//TODO: Exporting files is broken for now.
