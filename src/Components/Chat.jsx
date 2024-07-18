@@ -8,6 +8,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, database, storage } from '../firebase/setup';
 import { format } from 'date-fns';
 import { Avatar } from '@mui/material';
+import "./Chat.css"
+import chatBackgroundSvg from '../assets/chatBG2.svg';
 
 function Chat() {
     const [message, setMessage] = useState("");
@@ -113,25 +115,37 @@ function Chat() {
             <div className='bg-gray-800 text-white p-4'>
                 <h1 className='text-xl'>{location.state?.username || "Chat"}</h1>
             </div>
-            <div className='flex-1 p-4 overflow-y-auto'>
-            {messages.map((msg) => (
-                <div key={msg.id} className={`flex items-start mb-4 ${msg.senderId === auth.currentUser?.uid ? 'flex-row-reverse' : 'flex-row'}`}>
-                <Avatar
-                    src={msg.senderProfilePic || 'default-avatar-url.jpg'}
-                    alt={msg.senderName}
-                    className={`w-8 h-8 ${msg.senderId === auth.currentUser?.uid ? 'ml-2' : 'mr-2'}`}
-                />
-                    <div className={`p-2 m-2 rounded-lg ${msg.senderId === auth.currentUser?.uid ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}>
-                        <p>{msg.senderName}: {msg.message}</p>
-                        {msg.fileUrl && <img src={msg.fileUrl} alt="attachment" className='mt-2 max-w-xs' />}
-                        <p className={`text-xs mt-1 ${msg.senderId === auth.currentUser?.uid ? 'text-blue-200' : 'text-gray-600'}`}>
-                            {format(msg.timestamp.toDate(), 'MMM d, yyyy h:mm a')}
-                        </p>
-                    </div>
+            <div className='flex-1 relative overflow-hidden'>
+                <div 
+                    className='absolute inset-0 z-0 opacity-10'
+                    style={{
+                        backgroundImage: `url(${chatBackgroundSvg})`,
+                        backgroundRepeat: 'repeat',
+                        backgroundSize: '400px 300px',
+                        opacity:0.4,
+                    }}
+                ></div>
+                <div className='relative z-20 h-full overflow-y-auto p-4'>
+                    {messages.map((msg) => (
+                        <div key={msg.id} className={`flex items-start mb-4 ${msg.senderId === auth.currentUser?.uid ? 'flex-row-reverse' : 'flex-row'}`}>
+                            <Avatar
+                                src={msg.senderProfilePic || 'default-avatar-url.jpg'}
+                                alt={msg.senderName}
+                                className={`w-8 h-8 ${msg.senderId === auth.currentUser?.uid ? 'ml-2' : 'mr-2'}`}
+                            />
+                            <div className={`max-w-[70%] ${msg.senderId === auth.currentUser?.uid ? 'bg-green-600 text-white' : 'bg-slate-300 text-black'} rounded-lg p-3 shadow-md`}>
+                                <p className="font-semibold mb-1">{msg.senderName}</p>
+                                <p>{msg.message}</p>
+                                {msg.fileUrl && <img src={msg.fileUrl} alt="attachment" className='mt-2 max-w-xs rounded-md' />}
+                                <p className={`text-xs mt-1 ${msg.senderId === auth.currentUser?.uid ? 'text-blue-200' : 'text-gray-600'}`}>
+                                    {format(msg.timestamp.toDate(), 'MMM d, yyyy h:mm a')}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-            ))}
-        </div>
-            <div className='flex items-center p-4 border-t border-gray-300'>
+            </div>
+            <div className='flex items-center p-4 bg-white border-t border-gray-300 z-30'>
                 <button onClick={() => fileRef.current.click()} className='p-2'>
                     <LuPaperclip className='text-2xl text-gray-600' />
                 </button>
