@@ -21,6 +21,7 @@ const Sidebar = () => {
         ...doc.data(),
         id: doc.id
       }))
+      // console.log(filteredData);
       setUsers(filteredData);
     } catch (error) {
       console.error(error);
@@ -35,7 +36,7 @@ const Sidebar = () => {
 
 
   //todo[DONE]: add filter function so that the current user  does not shows up 
-
+  // console.log(users);
   return (
     <div>
       <div className='search'>
@@ -46,18 +47,18 @@ const Sidebar = () => {
         return <>
           <Link
           key={user.id}
-            to='/chat'
+            to='/Chat'
             className='chat-link'
             state={{
               id: user.id,
               username: user.username,
-              profile_image: user.profileImg
+              profile_image: user.profile_image
             }} >
             <Paper elevation={0} sx={{ border: "1px solid #D4D4D4" }}>
               <List>
                 <ListItem>
-                  <Avatar src={user.profileImg} />
-                  <ListItemText primary={user.username} />
+                  <Avatar src={user.profile_image} />
+                  <ListItemText primary={user.username} sx={{ marginLeft: "8px" }} />
                 </ListItem>
               </List>
             </Paper>

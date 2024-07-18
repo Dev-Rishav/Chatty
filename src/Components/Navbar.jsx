@@ -7,7 +7,6 @@ import { auth } from '../firebase/setup';
 import "./Navbar.css"
 
 export default function Navbar(props) {
-  // console.log(props);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar elevation={0} sx={{ backgroundColor: "#A855F7", height: "50px" }} position="static">
