@@ -6,6 +6,8 @@ import { addDoc, collection, query, orderBy, onSnapshot, where, or, and } from '
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, database, storage } from '../firebase/setup';
+import { format } from 'date-fns';
+import { Avatar } from '@mui/material';
 
 function Chat() {
     const [message, setMessage] = useState("");
@@ -47,6 +49,7 @@ function Chat() {
                 fileUrl,
                 senderName: auth.currentUser?.displayName,
                 senderId: auth.currentUser?.uid,
+                senderProfilePic: auth.currentUser?.photoURL, 
                 receiverId: location.state?.id,
                 timestamp: new Date()
             };
@@ -111,15 +114,23 @@ function Chat() {
                 <h1 className='text-xl'>{location.state?.username || "Chat"}</h1>
             </div>
             <div className='flex-1 p-4 overflow-y-auto'>
-                {messages.map((msg) => (
-                    <div key={msg.id} className={`flex ${msg.senderId === auth.currentUser?.uid ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`p-2 m-2 rounded-lg ${msg.senderId === auth.currentUser?.uid ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}>
-                            <p>{msg.senderName}: {msg.message}</p>
-                            {msg.fileUrl && <img src={msg.fileUrl} alt="attachment" className='mt-2 max-w-xs' />}
-                        </div>
+            {messages.map((msg) => (
+                <div key={msg.id} className={`flex items-start mb-4 ${msg.senderId === auth.currentUser?.uid ? 'flex-row-reverse' : 'flex-row'}`}>
+                <Avatar
+                    src={msg.senderProfilePic || 'default-avatar-url.jpg'}
+                    alt={msg.senderName}
+                    className={`w-8 h-8 ${msg.senderId === auth.currentUser?.uid ? 'ml-2' : 'mr-2'}`}
+                />
+                    <div className={`p-2 m-2 rounded-lg ${msg.senderId === auth.currentUser?.uid ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}>
+                        <p>{msg.senderName}: {msg.message}</p>
+                        {msg.fileUrl && <img src={msg.fileUrl} alt="attachment" className='mt-2 max-w-xs' />}
+                        <p className={`text-xs mt-1 ${msg.senderId === auth.currentUser?.uid ? 'text-blue-200' : 'text-gray-600'}`}>
+                            {format(msg.timestamp.toDate(), 'MMM d, yyyy h:mm a')}
+                        </p>
                     </div>
-                ))}
-            </div>
+                </div>
+            ))}
+        </div>
             <div className='flex items-center p-4 border-t border-gray-300'>
                 <button onClick={() => fileRef.current.click()} className='p-2'>
                     <LuPaperclip className='text-2xl text-gray-600' />

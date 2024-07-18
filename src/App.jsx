@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import Main from './Components/Main'
 import LoginSignUpPage from './Components/LoginSignupPage'
 import Chat from './Components/Chat'
+import Login from "./Components/Login"
 
 function App() {
 
