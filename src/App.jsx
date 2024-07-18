@@ -6,11 +6,15 @@ import Chat from './Components/Chat'
 function App() {
 
   return (
+    // <SignIn/>
+    // <div>
+    //   {/* <Header/> */}
       <Routes>
         <Route path='/' element={<LoginSignUpPage />} />
         <Route path='/Main' element={<Main />} />
         <Route path='/Chat' element={<Chat />} /> 
       </Routes>
+    // </div>
   )
 }
 

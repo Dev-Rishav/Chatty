@@ -14,6 +14,10 @@
     background-color: #e9e9e9;
 }
 
+.search-field::placeholder{
+    padding-left: 4%;
+}
+
 .search-icon{
     width: 25px;
     margin-left: 25px;
