@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import illustration from '../assets/mp.svg'; 
 import { FcGoogle } from 'react-icons/fc';
-import {GoogleAuthProvider, signInWithPopup} from "firebase/auth"
+import {signInWithPopup} from "firebase/auth"
 import {auth,database,googleProvider} from "../firebase/setup"
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -14,30 +14,31 @@ const LoginSignUpPage = () => {
     const navigate = useNavigate()
 
     const addUser=async () => {
-        console.log("Adduser invoked");
+        // console.log("Adduser invoked");
         const  userDoc = doc(database,"Users",`${auth.currentUser?.uid}`)
         try {
             await setDoc(userDoc,{
                 id:auth.currentUser?.uid,
                 username:auth.currentUser?.displayName,
-                profileImg:auth.currentUser?.photoURL
+                profile_image:auth.currentUser?.photoURL
             })
-            console.log("User added");
+            // console.log("User added");
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }
 
 
     const googleSignIn = async ()=>{
         try {
-        console.log("googleSignIn() invoked");
+        // console.log("googleSignIn() invoked");
             await signInWithPopup(auth,googleProvider)
-            console.log("terminated");
+            // console.log("terminated");
             addUser()
+            // console.log("successful");
             navigate("/Main")
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }
 
