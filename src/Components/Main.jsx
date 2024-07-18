@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import "./Main.css";
 import chatBg from "../assets/chatBg.svg"
+import {auth} from '../firebase/setup'
+import { onAuthStateChanged } from 'firebase/auth';
 
 const Main = () => {
+    const [loading,setLoading] = useState(true);
+
+    useEffect( ()=> {
+        const authListener = onAuthStateChanged(auth, (user) => {
+            setLoading(false)
+        })
+        return () => authListener();
+    },[]);
+
+
+    if(loading){
+        return <div>Loading...</div>
+    }
+
     return (
         <div>
             <Grid container>

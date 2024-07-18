@@ -14,6 +14,7 @@ const LoginSignUpPage = () => {
     const navigate = useNavigate()
 
     const addUser=async () => {
+        console.log("Adduser invoked");
         const  userDoc = doc(database,"Users",`${auth.currentUser?.uid}`)
         try {
             await setDoc(userDoc,{
@@ -30,9 +31,9 @@ const LoginSignUpPage = () => {
 
     const googleSignIn = async ()=>{
         try {
-        console.log("here");
+        console.log("googleSignIn() invoked");
             await signInWithPopup(auth,googleProvider)
-            console.log("not on hold");
+            console.log("terminated");
             addUser()
             navigate("/Main")
         } catch (error) {
@@ -41,7 +42,7 @@ const LoginSignUpPage = () => {
     }
 
 
-    console.log(auth);  //TODO
+    // console.log(auth);  //TODO
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-purple-500">
