@@ -41,5 +41,3 @@ const Main = () => {
 export default Main;
 
 //TODO: Implement search logic
-//TODO: Beautify Sidebar users
-//TODO: on clicking on link, change the state to which the chat component on the place of logo
