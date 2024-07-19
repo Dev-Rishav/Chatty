@@ -35,6 +35,12 @@ function Chat() {
         return () => unsubscribe();
     }, [navigate]);
 
+    const receiverObj={
+        receiverProfileImg:location.state?.profile_image,
+        receiverUsername:location.state?.username,
+    }
+    // console.log(location.state);
+
     const sendMessage = async () => {
         if (message.trim() === "" && !file) return;
         // console.log(message);
@@ -116,7 +122,7 @@ function Chat() {
         <img src={location.state?.profile_image} className="h-8 w-8 rounded-full object-cover mr-4" />
         <h1 className="text-xl">{location.state?.username || "Chat"}</h1>
     </div> */}
-    <Navbar />
+    <Navbar title={receiverObj}/>
             <div className='flex-1 relative overflow-hidden'>
                 <div 
                     className='absolute inset-0 z-0 opacity-10'
@@ -176,5 +182,7 @@ function Chat() {
 export default Chat;
 
 //TODO[DONE]: Exporting files is broken for now.
-//TODO: props are not being passed to the navbar that's why the sender profile being rendered.
+//TODO[Done]: props are not being passed to the navbar that's why the sender profile being rendered.
 //TODO: Add a return arrow to the navbar to go through pages easily.
+//TODO: while typing the bottom most chat must be rendered.
+//TODO: time stamp should be binned with name and make more minimal
