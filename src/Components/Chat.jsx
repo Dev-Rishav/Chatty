@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { Avatar } from '@mui/material';
 import "./Chat.css"
 import chatBackgroundSvg from '../assets/chatBG2.svg';
+import Navbar from './Navbar';
 
 function Chat() {
     const [message, setMessage] = useState("");
@@ -91,7 +92,7 @@ function Chat() {
                 ...doc.data(),
                 id: doc.id
             }));
-            console.log('Fetched messages:', fetchedMessages);
+            // console.log('Fetched messages:', fetchedMessages);
             setMessages(fetchedMessages);
         }, (error) => {
             console.error("Error fetching messages:", error);
@@ -100,7 +101,7 @@ function Chat() {
 
     useEffect(() => {
         if (!loading && auth.currentUser && location.state?.id) {
-            console.log('Fetching messages for id:', location.state.id);
+            // console.log('Fetching messages for id:', location.state.id);
             const unsubscribe = fetchMessages();
             return () => unsubscribe();
         }
@@ -109,12 +110,13 @@ function Chat() {
     if (loading) {
         return <div>Loading...</div>;
     }
-
     return (
-        <div className='flex flex-col h-screen'>
-            <div className='bg-gray-800 text-white p-4'>
-                <h1 className='text-xl'>{location.state?.username || "Chat"}</h1>
-            </div>
+        <div className="flex flex-col h-screen">
+    {/* <div className="bg-gray-100 text-gray-800 p-4 flex items-center">
+        <img src={location.state?.profile_image} className="h-8 w-8 rounded-full object-cover mr-4" />
+        <h1 className="text-xl">{location.state?.username || "Chat"}</h1>
+    </div> */}
+    <Navbar />
             <div className='flex-1 relative overflow-hidden'>
                 <div 
                     className='absolute inset-0 z-0 opacity-10'
@@ -125,7 +127,7 @@ function Chat() {
                         opacity:0.4,
                     }}
                 ></div>
-                <div className='relative z-20 h-full overflow-y-auto p-4'>
+                <div className='relative z-20 h-full overflow-y-auto p-4 scroll-smooth'>
                     {messages.map((msg) => (
                         <div key={msg.id} className={`flex items-start mb-4 ${msg.senderId === auth.currentUser?.uid ? 'flex-row-reverse' : 'flex-row'}`}>
                             <Avatar
@@ -133,12 +135,12 @@ function Chat() {
                                 alt={msg.senderName}
                                 className={`w-8 h-8 ${msg.senderId === auth.currentUser?.uid ? 'ml-2' : 'mr-2'}`}
                             />
-                            <div className={`max-w-[70%] ${msg.senderId === auth.currentUser?.uid ? 'bg-green-600 text-white' : 'bg-slate-300 text-black'} rounded-lg p-3 shadow-md`}>
+                            <div className={`max-w-[70%] ${msg.senderId === auth.currentUser?.uid ? 'bg-cyan-200 text-gray-700' : 'bg-slate-600 text-gray-200'} rounded-lg p-3 shadow-md`}>
                                 <p className="font-semibold mb-1">{msg.senderName}</p>
                                 <p>{msg.message}</p>
                                 {msg.fileUrl && <img src={msg.fileUrl} alt="attachment" className='mt-2 max-w-xs rounded-md' />}
-                                <p className={`text-xs mt-1 ${msg.senderId === auth.currentUser?.uid ? 'text-blue-200' : 'text-gray-600'}`}>
-                                    {format(msg.timestamp.toDate(), 'MMM d, yyyy h:mm a')}
+                                <p className={`text-xs mt-1 ${msg.senderId === auth.currentUser?.uid ? 'text-gray-700' : 'text-gray-200'}`}>
+                                    {format(msg.timestamp.toDate(), 'h:mm a')}
                                 </p>
                             </div>
                         </div>
@@ -147,7 +149,7 @@ function Chat() {
             </div>
             <div className='flex items-center p-4 bg-white border-t border-gray-300 z-30'>
                 <button onClick={() => fileRef.current.click()} className='p-2'>
-                    <LuPaperclip className='text-2xl text-gray-600' />
+                    <LuPaperclip className='text-2xl text-cyan-700' />
                 </button>
                 <input
                     type='file'
@@ -164,7 +166,7 @@ function Chat() {
                 />
                 {file && <p className='mx-2'>{file.name}</p>}
                 <button onClick={sendMessage} className='p-2'>
-                    <IoSendSharp className='text-2xl text-blue-500' />
+                    <IoSendSharp className='text-2xl text-cyan-700' />
                 </button>
             </div>
         </div>
@@ -173,4 +175,6 @@ function Chat() {
 
 export default Chat;
 
-//TODO: Exporting files is broken for now.
+//TODO[DONE]: Exporting files is broken for now.
+//TODO: props are not being passed to the navbar that's why the sender profile being rendered.
+//TODO: Add a return arrow to the navbar to go through pages easily.

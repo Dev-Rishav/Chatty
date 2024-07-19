@@ -21,7 +21,7 @@ export default function Navbar(props) {
                         </h3>
                     </div>
                     <div className="absolute inset-x-0 flex justify-center">
-                        <h1 className="text-3xl font-bold text-[#002D74] cursor-pointer" onClick={handleLogoClick} >Chatty
+                        <h1 className="text-3xl font-bold text-[#002D74] cursor-pointer " onClick={handleLogoClick} >Chatty
                         </h1>
                     </div>
                      <div className="flex-shrink-0 w-24"> {/* This is a placeholder to balance the layout */} 
