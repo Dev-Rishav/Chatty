@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
-import chatBg from "../assets/chatBg.svg";
+import Home from './Home'
 import { auth } from '../firebase/setup';
 import { onAuthStateChanged } from 'firebase/auth';
+import Chat  from './Chat'
 
 const Main = () => {
     const [loading, setLoading] = useState(true);
@@ -30,11 +31,7 @@ const Main = () => {
                     <Sidebar />
                 </Grid>
                 <Grid item xs={9}>
-                    <div className="flex flex-col items-center justify-center h-screen bg-[#E9E9E9] relative">
-                        <img src={chatBg} className="md:block hidden w-[500px] bg-aquamarine absolute left-1/2 top-50 transform -translate-x-1/2 -translate-y-[30%]" />
-                        <h1 className="absolute top-200 transform -translate-y-[-130%]  text-center font-light text-[58px]">Welcome to Chatty</h1>
-                        <h4 className="absolute text-center font-light text-[25px] transform -translate-y-[-450%]">where your closed ones meet</h4>
-                    </div>
+                    <Home/>
                 </Grid>
             </Grid>
         </div>
@@ -43,6 +40,6 @@ const Main = () => {
 
 export default Main;
 
-//TODO: Implement TODO logic
+//TODO: Implement search logic
 //TODO: Beautify Sidebar users
 //TODO: on clicking on link, change the state to which the chat component on the place of logo

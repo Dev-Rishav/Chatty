@@ -8,7 +8,6 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, database, storage } from '../firebase/setup';
 import { format } from 'date-fns';
 import { Avatar } from '@mui/material';
-import "./Chat.css"
 import chatBackgroundSvg from '../assets/chatBG2.svg';
 import Navbar from './Navbar';
 

@@ -1,6 +1,8 @@
 import React from 'react';
 import { auth } from '../firebase/setup';
 import { LuLogOut } from "react-icons/lu";
+import { IoArrowBackSharp } from "react-icons/io5";
+
 
 export default function Navbar(props) {
   const handleLogoClick= ()=>{
