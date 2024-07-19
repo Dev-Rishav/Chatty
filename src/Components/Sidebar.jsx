@@ -3,7 +3,6 @@ import { collection, getDocs } from 'firebase/firestore'
 import React, { useEffect, useState } from 'react'
 import { database, auth } from '../firebase/setup'
 import { FaMagnifyingGlass } from "react-icons/fa6";
-import "./Sidebar.css"
 import { Link } from 'react-router-dom';
 
 
