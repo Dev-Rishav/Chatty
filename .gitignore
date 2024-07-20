@@ -25,3 +25,4 @@ dist-ssr
 src/firebase/.env
 src/firebase/setup.js
 
+.env
