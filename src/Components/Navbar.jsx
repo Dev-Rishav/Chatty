@@ -3,11 +3,20 @@ import { auth } from '../firebase/setup';
 import { LuLogOut } from "react-icons/lu";
 import { IoMdArrowBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
+import { signOut } from 'firebase/auth';
 
 
 export default function Navbar(props) {
 
     const navigate=useNavigate();
+
+    const Logout = () => {
+        signOut(auth).then(() => {
+            navigate('/');
+        }).catch((error) => {
+            console.error("Unable to Logout", error);
+        });
+    }
 
 
     const handleLogoClick = () => {
@@ -42,8 +51,8 @@ export default function Navbar(props) {
                 </h1>
             </div>
             <div className="flex items-center">
-                <button className="flex items-center space-x-1 p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <LuLogOut className='w-5 h-5' />
+                <button onClick={Logout} className="flex items-center space-x-1 p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <LuLogOut className='w-5 h-5'  />
                     <span className='sm:block hidden'>Logout</span>
                 </button>
             </div>

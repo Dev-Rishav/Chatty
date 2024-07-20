@@ -5,7 +5,6 @@ import Sidebar from './Sidebar';
 import Home from './Home'
 import { auth } from '../firebase/setup';
 import { onAuthStateChanged } from 'firebase/auth';
-import Chat  from './Chat'
 
 const Main = () => {
     const [loading, setLoading] = useState(true);
