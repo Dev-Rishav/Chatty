@@ -38,11 +38,10 @@ function Chat() {
     const receiverObj = {
         receiverProfileImg: location.state?.profile_image,
         receiverUsername: location.state?.username,
-    }
+    };
 
     const sendMessage = async () => {
         if (message.trim() === "" && !file) return;
-        // console.log(message);
 
         try {
             let fileUrl = "";
@@ -61,7 +60,7 @@ function Chat() {
                 receiverId: location.state?.id,
                 timestamp: new Date()
             };
-            // console.log(messageData);
+
             await addDoc(collection(database, "Messages"), messageData);
             setMessage("");
             setFile(null);
@@ -97,7 +96,6 @@ function Chat() {
                 ...doc.data(),
                 id: doc.id
             }));
-            // console.log('Fetched messages:', fetchedMessages);
             setMessages(fetchedMessages);
         }, (error) => {
             console.error("Error fetching messages:", error);
@@ -122,18 +120,26 @@ function Chat() {
     }
 
     return (
-        <div className="flex h-screen">
+        <>
+        <Navbar
+                    title={receiverObj}
+                    showSidebarToggle={true}
+                    onSidebarToggle={() => setShowSidebar(!showSidebar)}
+                />
+        <div className="flex h-screen overflow-hidden">
+            
             {showSidebar && (
                 <div className="w-1/4 min-w-[250px]">
                     <Sidebar />
                 </div>
             )}
+            
             <div className={`flex flex-col ${showSidebar ? 'w-3/4' : 'w-full'}`}>
-                <Navbar
+                {/* <Navbar
                     title={receiverObj}
                     showSidebarToggle={true}
                     onSidebarToggle={() => setShowSidebar(!showSidebar)}
-                />
+                /> */}
                 <div className='flex-1 relative overflow-hidden'>
                     <div
                         className='absolute inset-0 z-0 opacity-10 blur-sm'
@@ -160,37 +166,46 @@ function Chat() {
                                         </span>
                                     </p>
                                     <p>{msg.message}</p>
-                                    {msg.fileUrl && <img src={msg.fileUrl} alt="attachment" className='mt-2 max-w-xs rounded-md' />}
+                                    {msg.fileUrl && <img src={msg.fileUrl} alt="file" className="mt-2" />}
                                 </div>
                             </div>
                         ))}
                         <div ref={messagesEndRef} />
                     </div>
                 </div>
-                <div className='flex items-center p-4 bg-white border-t border-gray-300 z-30'>
-                    <button onClick={() => fileRef.current.click()} className='p-2'>
-                        <LuPaperclip className='text-2xl text-cyan-700' />
-                    </button>
-                    <input
-                        type='file'
-                        ref={fileRef}
-                        onChange={(e) => setFile(e.target.files[0])}
-                        className='hidden'
-                    />
-                    <input
-                        type='text'
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        className='flex-1 p-2 mx-2 border rounded-lg'
-                        placeholder='Type a message...'
-                    />
-                    {file && <p className='mx-2'>{file.name}</p>}
-                    <button onClick={sendMessage} className='p-2'>
-                        <IoSendSharp className='text-2xl text-cyan-700' />
-                    </button>
+                <div className='relative z-20 p-4 bg-gray-100'>
+                    <div className='flex items-center'>
+                        <button 
+                            onClick={() => fileRef.current.click()} 
+                            className='p-2 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                        >
+                            <LuPaperclip className='w-6 h-6 text-gray-700' />
+                        </button>
+                        <input 
+                            type="file" 
+                            ref={fileRef} 
+                            className='hidden' 
+                            onChange={(e) => setFile(e.target.files[0])} 
+                        />
+                        <input 
+                            type="text" 
+                            className='flex-1 mx-4 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500' 
+                            placeholder='Type a message...' 
+                            value={message} 
+                            onChange={(e) => setMessage(e.target.value)} 
+                            onKeyPress={(e) => e.key === 'Enter' && sendMessage()} 
+                        />
+                        <button 
+                            onClick={sendMessage} 
+                            className='p-2 rounded-full bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                        >
+                            <IoSendSharp className='w-6 h-6 text-white' />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+        </>
     );
 }
 

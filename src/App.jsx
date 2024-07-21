@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import Main from './Components/Main'
-import Chat from './Components/Chat2'
+import ChatLayout from './Components/ChatLayout'
 import Landing from './Components/Landing'
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Landing />} />
         <Route path='/Main' element={<Main />} />
-        <Route path='/Chat' element={<Chat />} /> 
+        <Route path='/ChatLayout' element={<ChatLayout />} /> 
       </Routes>
     // </div>
   )

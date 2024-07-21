@@ -6,6 +6,7 @@ function ChatLayout() {
     const [showSidebar, setShowSidebar] = useState(false);
 
     return (
+        <>
         <div className="flex h-screen">
             {showSidebar && (
                 <div className="w-1/4 min-w-[250px]">
@@ -16,6 +17,7 @@ function ChatLayout() {
                 <Chat showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
             </div>
         </div>
+        </>
     );
 }
 

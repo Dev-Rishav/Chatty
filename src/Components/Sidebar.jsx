@@ -52,7 +52,7 @@ const Sidebar = () => {
                 return <div className='mt-3 w-50'>
                     <Link
                         key={user.id}
-                        to='/Chat'
+                        to='/ChatLayout'
                         className='block px-3 text-gray-700 hover:scale-105 duration-300 '
                         state={{
                             id: user.id,
