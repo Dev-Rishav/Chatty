@@ -24,8 +24,8 @@ export default function Navbar(props) {
     };
     // console.log(props);
     return (
-        <nav className="bg-gray-100 shadow-md">
-    <div className="max-w-7xl  px-2 sm:px-6 lg:px-8">
+        <nav className="bg-gray-100 shadow-md sticky top-0 z-50">
+    <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="relative flex items-center justify-between h-12">
             <div className="flex items-center space-x-4">
                 <button 
@@ -40,7 +40,7 @@ export default function Navbar(props) {
                         src={props.title?.receiverProfileImg ?? auth.currentUser?.photoURL}
                         alt="Profile"
                     />}
-                    <h3 className="sm:block hidden ml-3 font-medium text-gray-800 text-sm">
+                    <h3 className="md:block hidden ml-3 font-medium text-gray-800 text-sm">
                         {(props.title?.receiverUsername ?? auth.currentUser?.displayName) || ""}
                     </h3>
                 </div>
