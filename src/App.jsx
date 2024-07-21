@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import Main from './Components/Main'
-import Chat from './Components/Chat'
+import Chat from './Components/Chat2'
 import Landing from './Components/Landing'
 
 function App() {

@@ -4,6 +4,7 @@ import { LuLogOut } from "react-icons/lu";
 import { IoMdArrowBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
+import { IoMenuOutline } from 'react-icons/io5';
 
 
 export default function Navbar(props) {
@@ -26,14 +27,22 @@ export default function Navbar(props) {
     return (
         <nav className="bg-gray-100 shadow-md sticky top-0 z-50">
     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        
         <div className="relative flex items-center justify-between h-12">
+            
             <div className="flex items-center space-x-4">
                 <button 
                     className="p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     onClick={() => navigate('/Main')}
                 >
-                    { (props.title?.receiverUsername ?? auth.currentUser?.displayName) && <IoMdArrowBack className='w-5 h-5' />}
+                    {/* { (props.title?.receiverUsername ?? auth.currentUser?.displayName) && <IoMdArrowBack className='w-5 h-5' />} */}
+                    { props.title && <IoMdArrowBack className='w-5 h-5' />}
                 </button>
+                {props.showSidebarToggle && (
+                <button onClick={props.onSidebarToggle} className="mr-4">
+                    <IoMenuOutline className="text-2xl" />
+                </button>
+            )} 
                 <div className="flex-shrink-0 flex items-center">
                 {(props.title?.receiverUsername ?? auth.currentUser?.displayName) &&<img
                         className="h-8 w-8 rounded-full object-cover"

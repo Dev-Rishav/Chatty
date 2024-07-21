@@ -37,7 +37,7 @@ const Sidebar = () => {
     //todo[DONE]: add filter function so that the current user  does not shows up 
     // console.log(users);
     return (
-        <div className="bg-gray-50 shadow-md h-screen w-90">
+        <div className="bg-gray-50 shadow-md h-full overflow-y-auto">
             <div className="flex items-center p-4 border-b border-gray-200 ">
                 
                 <input

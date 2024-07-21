@@ -1,41 +1,22 @@
-import { Grid } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import Sidebar from './Sidebar'
-import Navbar from './Navbar'
-import { onAuthStateChanged } from 'firebase/auth'
-import { auth } from '../firebase/setup'
-import Chat from './Chat'
+import React, { useState } from 'react';
+import Chat from './Chat';
+import Sidebar from './Sidebar';
 
-
-const Chat2 = () => {
-
-
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const authListener = onAuthStateChanged(auth, (user) => {
-            setLoading(false);
-        });
-        return () => authListener();
-    }, [])
-
-    if (loading) return <div>Loading</div>
+function ChatLayout() {
+    const [showSidebar, setShowSidebar] = useState(false);
 
     return (
-        <div>
-            <Grid container>
-                <Grid item xs={12}>
-                    <Navbar />
-                </Grid>
-                <Grid item xs={3}>
+        <div className="flex h-screen">
+            {showSidebar && (
+                <div className="w-1/4 min-w-[250px]">
                     <Sidebar />
-                </Grid>
-                <Grid item xs={9}>
-                    <Chat />
-                </Grid>
-            </Grid>
+                </div>
+            )}
+            <div className={`flex-1 ${showSidebar ? 'w-3/4' : 'w-full'}`}>
+                <Chat showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+            </div>
         </div>
-    )
+    );
 }
 
-export default Chat2
+export default ChatLayout;
