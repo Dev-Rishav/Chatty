@@ -6,6 +6,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, database, googleProvider } from "../firebase/setup";
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import Navbar from './Navbar';
 
 const Landing = () => {
     const [isSignUp, setIsSignUp] = useState(false);
@@ -40,6 +41,8 @@ const Landing = () => {
     };
 
     return (
+        <>
+        <Navbar/>
         <section className='bg-cyan-100 min-h-screen flex items-center justify-center'>
             <div className='bg-gray-50 flex rounded-2xl shadow-lg max-w-3xl p-5 items-center'>
                 <div className='md:w-1/2 px-16 '>
@@ -102,6 +105,7 @@ const Landing = () => {
                 </div>
             </div>
         </section>
+        </>
     );
 };
 

@@ -122,14 +122,14 @@ function Chat() {
         <h1 className="text-xl">{location.state?.username || "Chat"}</h1>
     </div> */}
     <Navbar title={receiverObj}/>
-            <div className='flex-1 relative overflow-hidden'>
+            <div className='flex-1 relative overflow-hidden '>
                 <div 
-                    className='absolute inset-0 z-0 opacity-10'
+                    className='absolute inset-0 z-0 opacity-10 blur-sm'
                     style={{
                         backgroundImage: `url(${chatBackgroundSvg})`,
                         backgroundRepeat: 'repeat',
                         backgroundSize: '400px 300px',
-                        opacity:0.4,
+                        opacity:0.5,
                     }}
                 ></div>
                 <div className='relative z-20 h-full overflow-y-auto p-4 scroll-smooth'>
@@ -182,6 +182,8 @@ export default Chat;
 
 //TODO[DONE]: Exporting files is broken for now.
 //TODO[Done]: props are not being passed to the navbar that's why the sender profile being rendered.
-//TODO: Add a return arrow to the navbar to go through pages easily.
+//TODO[Done]: Add a return arrow to the navbar to go through pages easily.
 //TODO: while typing the bottom most chat must be rendered.
 //TODO: time stamp should be binned with name and make more minimal
+//TODO: Stick navbar while scrolling 
+//TODO: Handle offline state

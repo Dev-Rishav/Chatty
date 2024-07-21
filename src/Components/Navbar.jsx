@@ -22,26 +22,26 @@ export default function Navbar(props) {
     const handleLogoClick = () => {
         window.location.reload();
     };
-    console.log(props);
+    // console.log(props);
     return (
         <nav className="bg-gray-100 shadow-md">
-    <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+    <div className="max-w-7xl  px-2 sm:px-6 lg:px-8">
         <div className="relative flex items-center justify-between h-12">
             <div className="flex items-center space-x-4">
                 <button 
                     className="p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     onClick={() => navigate('/Main')}
                 >
-                    <IoMdArrowBack className='w-5 h-5' />
+                    { (props.title?.receiverUsername ?? auth.currentUser?.displayName) && <IoMdArrowBack className='w-5 h-5' />}
                 </button>
                 <div className="flex-shrink-0 flex items-center">
-                    <img
+                {(props.title?.receiverUsername ?? auth.currentUser?.displayName) &&<img
                         className="h-8 w-8 rounded-full object-cover"
                         src={props.title?.receiverProfileImg ?? auth.currentUser?.photoURL}
                         alt="Profile"
-                    />
+                    />}
                     <h3 className="sm:block hidden ml-3 font-medium text-gray-800 text-sm">
-                        {props.title?.receiverUsername ?? auth.currentUser.displayName}
+                        {(props.title?.receiverUsername ?? auth.currentUser?.displayName) || ""}
                     </h3>
                 </div>
             </div>
@@ -51,13 +51,16 @@ export default function Navbar(props) {
                 </h1>
             </div>
             <div className="flex items-center">
-                <button onClick={Logout} className="flex items-center space-x-1 p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                { (props.title?.receiverUsername ?? auth.currentUser?.displayName) && <button onClick={Logout} className="flex items-center space-x-1 p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     <LuLogOut className='w-5 h-5'  />
                     <span className='sm:block hidden'>Logout</span>
-                </button>
+                </button>}
             </div>
         </div>
     </div>
 </nav>
     );
 }
+
+//TODO: search logic
+//TODO: Phone number login
