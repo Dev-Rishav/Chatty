@@ -6,12 +6,10 @@ import { FaMagnifyingGlass } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
 
 
-
 const Sidebar = () => {
 
     const [users, setUsers] = useState([])
-
-
+    
     const getUser = async () => {
         const userRef = collection(database, "Users")
         try {
@@ -38,14 +36,17 @@ const Sidebar = () => {
     // console.log(users);
     return (
         <div className="bg-gray-50 shadow-md h-full overflow-y-auto">
+            <div className='pt-4 font-bold text-2xl text-[#002D74] text-center'>
+                <h2>   Friends </h2>
+            </div>
             <div className="flex items-center p-4 border-b border-gray-200 ">
                 
                 <input
                     type="text"
                     placeholder="Search"
-                    className="ml-2 p-2 w-80 h-8 rounded-xl bg-gray-100 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="ml-0 p-1 w-80 h-8 rounded-xl bg-gray-100 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
-                <FaMagnifyingGlass className="text-gray-500 w-6 h-6 ml-4" />
+                <FaMagnifyingGlass className="text-gray-500 w-6 h-6 ml-4 cursor-pointer" />
             </div>
 
             {users.filter(user => user.id !== auth.currentUser?.uid).map((user) => {
@@ -76,5 +77,4 @@ const Sidebar = () => {
 }
 
 export default Sidebar
-
 //TODO: write searching logic for to find the chats.
