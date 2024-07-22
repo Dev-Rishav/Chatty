@@ -6,7 +6,7 @@ Chatty is a modern, real-time messaging application that allows users to communi
 
 You can experience Chatty live at:
 
-**[chatty-flame.vercel.app](https://chatty-flame.vercel.app)**
+**[chatty-theta-five.vercel.app](https://chatty-theta-five.vercel.app)**
 
 Feel free to create an account and start chatting!
 
@@ -50,7 +50,7 @@ Feel free to create an account and start chatting!
 ### Installation
 
 1. Clone the repository: `https://github.com/Dev-Rishav/Chatty.git`
-2. Navigate to the project directory: `cd chatty` 
+2. Navigate to the project directory: `cd chatty`
 3. Install dependencies: `npm install`
 4. Start the development server: `npm run dev`
 5. Open your browser and visit `http://localhost:5173` to view the application.
@@ -83,3 +83,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Beautiful illustrations provided by:
   - [unDraw](https://undraw.co/illustrations)
   - [Jozef Mikulcik on Pixabay](https://pixabay.com/users/jozefm84-10215106/)
+- Thanks to [W3Schools](https://www.w3schools.com) for their comprehensive tutorials.
+- Special thanks to [Hitesh Choudhary](https://github.com/hiteshchoudhary) aka [Chai Aur Code](https://www.youtube.com/@chaiaurcode) for his valuable tutorials and guidance.
