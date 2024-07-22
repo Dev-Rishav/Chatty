@@ -71,5 +71,5 @@ export default function Navbar(props) {
     );
 }
 
-//TODO: search logic
+//TODO[DONE]: search logic
 //TODO: Phone number login

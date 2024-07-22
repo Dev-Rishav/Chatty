@@ -6,15 +6,11 @@ import Landing from './Components/Landing'
 function App() {
 
   return (
-    // <SignIn/>
-    // <div>
-    //   {/* <Header/> */}
       <Routes>
         <Route path='/' element={<Landing />} />
         <Route path='/Main' element={<Main />} />
         <Route path='/ChatLayout' element={<ChatLayout />} /> 
       </Routes>
-    // </div>
   )
 }
 

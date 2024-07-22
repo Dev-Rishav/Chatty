@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SignIn from '../assets/SignIn.png';
 import { PiEye, PiEyeSlash } from "react-icons/pi";
 import { FcGoogle } from "react-icons/fc";
-import { signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, database, googleProvider } from "../firebase/setup";
 import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,9 @@ import Navbar from './Navbar';
 const Landing = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
     const addUser = async () => {
@@ -18,21 +21,68 @@ const Landing = () => {
         try {
             await setDoc(userDoc, {
                 id: auth.currentUser?.uid,
-                username: auth.currentUser?.displayName,
-                profile_image: auth.currentUser?.photoURL
+                username: auth.currentUser?.displayName || email.split('@')[0],
+                profile_image: auth.currentUser?.photoURL || null
             });
         } catch (error) {
             console.error(error);
         }
     };
 
+    const emailSignin = async (props) => {
+        const { email, password, isSignUp } = props;
+        try {
+            if (isSignUp) {
+                await createUserWithEmailAndPassword(auth, email, password);
+                await addUser();
+            } else {
+                await signInWithEmailAndPassword(auth, email, password);
+            }
+            navigate("/Main");
+        } catch (error) {
+            console.error("Full error object:", error);
+            console.error("Error code:", error.code);
+            console.error("Error message:", error.message);
+    
+            switch(error.code) {
+                case 'auth/user-not-found':
+                    setErrorMessage('No account found with this email. Please sign up.');
+                    break;
+                case 'auth/wrong-password':
+                    setErrorMessage('Incorrect password. Please try again.');
+                    break;
+                case 'auth/invalid-email':
+                    setErrorMessage('Invalid email address. Please check and try again.');
+                    break;
+                case 'auth/email-already-in-use':
+                    setErrorMessage('An account with this email already exists. Please log in.');
+                    break;
+                case 'auth/weak-password':
+                    setErrorMessage('Password is too weak. Please use a stronger password.');
+                    break;
+                case 'auth/network-request-failed':
+                    setErrorMessage('Network error. Please check your internet connection and try again.');
+                    break;
+                default:
+                    setErrorMessage(`An error occurred: ${error.message}`);
+            }
+        }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setErrorMessage(''); // Clear any previous error messages
+        emailSignin({ email, password, isSignUp });
+    };
+
     const googleSignIn = async () => {
         try {
             await signInWithPopup(auth, googleProvider);
-            addUser();
+            await addUser();
             navigate("/Main");
         } catch (error) {
             console.error(error);
+            setErrorMessage('An error occurred with Google Sign-In. Please try again.');
         }
     };
 
@@ -48,14 +98,29 @@ const Landing = () => {
                 <div className='md:w-1/2 px-16 '>
                     <h2 className='font-bold text-2xl text-[#002D74] text-center'>{isSignUp ? 'Sign Up' : 'Login'}</h2>
 
-                    <form action='' className='flex flex-col gap-4'>
-                        <input className='p-2 mt-8 rounded-xl border' type='email' name='email' placeholder='Email' />
+                    {errorMessage && (
+                        <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                            {errorMessage}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+                        <input  
+                            className='p-2 mt-8 rounded-xl border' 
+                            type='email' 
+                            name='email' 
+                            placeholder='Email' 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
                         <div className='relative'>
                             <input 
                                 className='w-full p-2 rounded-xl border' 
                                 type={showPassword ? 'text' : 'password'} 
                                 name='password' 
                                 placeholder='Password' 
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                             <button 
                                 type="button"
@@ -65,7 +130,7 @@ const Landing = () => {
                                 {showPassword ? <PiEyeSlash /> : <PiEye />}
                             </button>
                         </div>
-                        <button className='bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300'>
+                        <button type="submit" className='bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300'>
                             {isSignUp ? 'Sign Up' : 'Login'}
                         </button>
                     </form>
