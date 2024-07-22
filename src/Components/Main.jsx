@@ -26,10 +26,10 @@ const Main = () => {
                 <Grid item xs={12}>
                     <Navbar />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={12} sm={4} md={3}>
                     <Sidebar />
                 </Grid>
-                <Grid item xs={9}>
+                <Grid item xs={12} sm={8} md={9}>
                     <Home/>
                 </Grid>
             </Grid>

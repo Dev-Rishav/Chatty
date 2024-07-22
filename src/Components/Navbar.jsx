@@ -23,7 +23,7 @@ export default function Navbar(props) {
     const handleLogoClick = () => {
         window.location.reload();
     };
-    // console.log(props);
+    // console.log(auth.currentUser);
     return (
         <nav className="bg-gray-100 shadow-md sticky top-0 z-50">
     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -44,13 +44,13 @@ export default function Navbar(props) {
                 </button>
             )} 
                 <div className="flex-shrink-0 flex items-center">
-                {(props.title?.receiverUsername ?? auth.currentUser?.displayName) &&<img
+                {(props.title?.receiverUsername ?? auth.currentUser?.displayName ) &&<img
                         className="h-8 w-8 rounded-full object-cover"
                         src={props.title?.receiverProfileImg ?? auth.currentUser?.photoURL}
                         alt="Profile"
                     />}
                     <h3 className="md:block hidden ml-3 font-medium text-gray-800 text-sm">
-                        {(props.title?.receiverUsername ?? auth.currentUser?.displayName) || ""}
+                        {(props.title?.receiverUsername ?? auth.currentUser?.displayName ?? auth.currentUser?.email) || ""}
                     </h3>
                 </div>
             </div>
@@ -60,7 +60,7 @@ export default function Navbar(props) {
                 </h1>
             </div>
             <div className="flex items-center">
-                { (props.title?.receiverUsername ?? auth.currentUser?.displayName) && <button onClick={Logout} className="flex items-center space-x-1 p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                { (props.title?.receiverUsername ?? auth.currentUser) && <button onClick={Logout} className="flex items-center space-x-1 p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     <LuLogOut className='w-5 h-5'  />
                     <span className='sm:block hidden'>Logout</span>
                 </button>}
