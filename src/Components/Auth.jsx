@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import SignIn from '../assets/SignIn.png';
 import { PiEye, PiEyeSlash } from "react-icons/pi";
 import { FcGoogle } from "react-icons/fc";
-import { createUserWithEmailAndPassword, signInWithPopup, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
-import { auth, database, googleProvider } from "../firebase/setup";
-import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 
-const Login = () => {
+const Auth = () => {
     const [user, setUser] = useState({
         email: '',
         password: '',
@@ -41,27 +38,27 @@ const Login = () => {
 
     const handlePasswordReset = async (e) => {
         e.preventDefault();
-        try {
-            await sendPasswordResetEmail(auth, user.email);
-            setErrorMessage('');
-            setIsResetPassword(false);
-            alert(`Password reset email sent to ${user.email}. Please check your inbox and spam folder.`);
-        } catch (error) {
-            console.error("Password reset error:", error);
-            switch(error.code) {
-                case 'auth/user-not-found':
-                    setErrorMessage('No account found with this email.');
-                    break;
-                case 'auth/invalid-email':
-                    setErrorMessage('Invalid email address. Please check and try again.');
-                    break;
-                case 'auth/too-many-requests':
-                    setErrorMessage('Too many password reset attempts. Please try again later.');
-                    break;
-                default:
-                    setErrorMessage(`An error occurred: ${error.message}`);
-            }
-        }
+        // try {
+        //     await sendPasswordResetEmail(auth, user.email);
+        //     setErrorMessage('');
+        //     setIsResetPassword(false);
+        //     alert(`Password reset email sent to ${user.email}. Please check your inbox and spam folder.`);
+        // } catch (error) {
+        //     console.error("Password reset error:", error);
+        //     switch(error.code) {
+        //         case 'auth/user-not-found':
+        //             setErrorMessage('No account found with this email.');
+        //             break;
+        //         case 'auth/invalid-email':
+        //             setErrorMessage('Invalid email address. Please check and try again.');
+        //             break;
+        //         case 'auth/too-many-requests':
+        //             setErrorMessage('Too many password reset attempts. Please try again later.');
+        //             break;
+        //         default:
+        //             setErrorMessage(`An error occurred: ${error.message}`);
+        //     }
+        // }
     };
 
     return (
@@ -176,4 +173,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Auth;
