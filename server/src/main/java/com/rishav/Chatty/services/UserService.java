@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -51,6 +52,8 @@ public class UserService {
             System.out.println(token+"token");
             UserDTO userDTO=new UserDTO();
             userDTO.setUsername(authenticatedUser.getUsername());
+            userDTO.setEmail(authenticatedUser.getEmail());
+            userDTO.setUser_id(authenticatedUser.getUser_id());
 
             Map<String, Object> res=new HashMap<>();
             res.put("token",token);
@@ -61,4 +64,7 @@ public class UserService {
             return Collections.singletonMap("Message","failure");
     }
 
+    public List<Users> getAllUsers() {
+        return repo.findAll();
+    }
 }
