@@ -16,6 +16,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -35,9 +38,10 @@ public class SecurityConfig {
         return  http
                 .csrf(customizer-> customizer.disable())
                 .authorizeHttpRequests(request-> request
-                        .requestMatchers("register","login")
-                        .permitAll()
-                        .anyRequest().authenticated())
+//                        .requestMatchers("register","login")
+//                        .permitAll()
+//                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session-> session.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS))
@@ -57,4 +61,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
+
+
 }
