@@ -18,9 +18,8 @@ const Auth = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [isResetPassword, setIsResetPassword] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
-    // const formRef=useRef(null);
 
+    const navigate = useNavigate();
     const {signupSuccess,error,isAuthenticated}=useSelector(state=>state.auth);
 
 
@@ -42,7 +41,6 @@ const Auth = () => {
         if(error){
             toast.error(error);
             console.error(error);
-            
         }
     }, [error]);
 

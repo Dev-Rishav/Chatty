@@ -1,42 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { Grid } from '@mui/material';
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
-import Home from './Home'
-import { auth } from '../firebase/setup';
-import { onAuthStateChanged } from 'firebase/auth';
+import React, { useEffect} from "react";
+import { Grid } from "@mui/material";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
+import Home from "./Home";
+import { useSelector } from "react-redux";
 
 const Main = () => {
-    const [loading, setLoading] = useState(true);
+  const loading = useSelector((state) => state.auth.loading);
 
-    useEffect(() => {
-        const authListener = onAuthStateChanged(auth, (user) => {
-            setLoading(false);
-        });
-        return () => authListener();
-    }, []);
-
+  useEffect(() => {
     if (loading) {
-        return <div>Loading...</div>;
+      return <div>Loading...</div>;
     }
+  }, [loading]);
 
-    return (
-        <div>
-            <Grid container>
-                <Grid item xs={12}>
-                    <Navbar />
-                </Grid>
-                <Grid item xs={12} sm={4} md={3}>
-                    <Sidebar />
-                </Grid>
-                <Grid item xs={12} sm={8} md={9}>
-                    <Home/>
-                </Grid>
-            </Grid>
-        </div>
-    );
+  return (
+    <div>
+      <Grid container>
+        <Grid item xs={12}>
+          <Navbar />
+        </Grid>
+        <Grid item xs={12} sm={4} md={3}>
+          <Sidebar />
+        </Grid>
+        <Grid item xs={12} sm={8} md={9}>
+          <Home />
+        </Grid>
+      </Grid>
+    </div>
+  );
 };
 
 export default Main;
-
-//TODO: Implement search logic
