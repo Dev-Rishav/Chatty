@@ -24,11 +24,11 @@ public class UserController {
         return userService.verify(user);
     }
 
-    @GetMapping("/login")
-    @ResponseBody
-    public String greet(){
-        return  "Hello";
-    }
+//    @GetMapping("/login")
+//    @ResponseBody
+//    public String greet(){
+//        return  "Hello";
+//    }
 
     @PostMapping("/register")
     @ResponseBody

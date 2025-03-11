@@ -1,35 +1,55 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SignIn from '../assets/SignIn.png';
 import { PiEye, PiEyeSlash } from "react-icons/pi";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
+import {loginUser} from "../redux/actions/authActions"
 
 const Auth = () => {
+    const dispatch = useDispatch();
     const [user, setUser] = useState({
         email: '',
         password: '',
-        userName: ''
+        userName: 'ris'         //TODO For now, we are setting a default username
     });
     
     const [isSignUp, setIsSignUp] = useState(false);
     const [isResetPassword, setIsResetPassword] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+    // const formRef=useRef(null);
+
+    const {error,isAuthenticated}=useSelector(state=>state.auth);
+    // const error=useSelector(state=>state.auth.error);
 
     const addUser = async () => {
         
     };
 
 
-    const handleSubmit = (e) => {
-        const { email, password } = user;
-        e.preventDefault();
-        console.log(user);
-        setErrorMessage(''); // Clear any previous error messages
-    };
+    useEffect(() => {
+        if(isAuthenticated){
+            navigate('/Main');
+        }
+    }, [isAuthenticated,navigate]);
 
+    useEffect(() => {
+        if(error){
+            toast.error(error);
+            console.error(error);
+            
+        }
+    }, [error]);
+
+    
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        dispatch(loginUser(user));
+    };
 
 
     const togglePasswordVisibility = () => {
@@ -71,9 +91,9 @@ const Auth = () => {
                         {isResetPassword ? 'Reset Password' : (isSignUp ? 'Sign Up' : 'Login')}
                     </h2>
 
-                    {errorMessage && (
+                    {error && (
                         <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
-                            {errorMessage}
+                            {error}
                         </div>
                     )}
 
