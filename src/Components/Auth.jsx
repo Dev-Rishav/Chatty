@@ -6,14 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import {loginUser} from "../redux/actions/authActions"
+import {loginUser,registerUser} from "../redux/actions/authActions"
 
 const Auth = () => {
     const dispatch = useDispatch();
     const [user, setUser] = useState({
         email: '',
-        password: '',
-        userName: 'ris'         //TODO For now, we are setting a default username
+        password: ''
     });
     
     const [isSignUp, setIsSignUp] = useState(false);
@@ -22,12 +21,7 @@ const Auth = () => {
     const navigate = useNavigate();
     // const formRef=useRef(null);
 
-    const {error,isAuthenticated}=useSelector(state=>state.auth);
-    // const error=useSelector(state=>state.auth.error);
-
-    const addUser = async () => {
-        
-    };
+    const {signupSuccess,error,isAuthenticated}=useSelector(state=>state.auth);
 
 
     useEffect(() => {
@@ -35,6 +29,14 @@ const Auth = () => {
             navigate('/Main');
         }
     }, [isAuthenticated,navigate]);
+
+
+    useEffect(() => {
+        if (signupSuccess) {
+            setIsSignUp(false);
+        }
+    }, [signupSuccess]);
+
 
     useEffect(() => {
         if(error){
@@ -48,7 +50,11 @@ const Auth = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch(loginUser(user));
+        if (isSignUp) {
+            dispatch(registerUser(user));
+        } else {
+            dispatch(loginUser(user));
+        }
     };
 
 
@@ -58,27 +64,7 @@ const Auth = () => {
 
     const handlePasswordReset = async (e) => {
         e.preventDefault();
-        // try {
-        //     await sendPasswordResetEmail(auth, user.email);
-        //     setErrorMessage('');
-        //     setIsResetPassword(false);
-        //     alert(`Password reset email sent to ${user.email}. Please check your inbox and spam folder.`);
-        // } catch (error) {
-        //     console.error("Password reset error:", error);
-        //     switch(error.code) {
-        //         case 'auth/user-not-found':
-        //             setErrorMessage('No account found with this email.');
-        //             break;
-        //         case 'auth/invalid-email':
-        //             setErrorMessage('Invalid email address. Please check and try again.');
-        //             break;
-        //         case 'auth/too-many-requests':
-        //             setErrorMessage('Too many password reset attempts. Please try again later.');
-        //             break;
-        //         default:
-        //             setErrorMessage(`An error occurred: ${error.message}`);
-        //     }
-        // }
+      //TODO: Implement password reset functionality
     };
 
     return (

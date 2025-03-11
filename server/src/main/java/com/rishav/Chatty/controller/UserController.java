@@ -32,7 +32,9 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseBody
-    public Users register(@RequestBody  Users user){
+    public Users register(@RequestBody  Users user)
+    {
+        System.out.println("teh incoming object is= "+user);
         return  userService.addUser(user);
     }
 

@@ -30,8 +30,13 @@ public class UserService {
     private BCryptPasswordEncoder encoder=new BCryptPasswordEncoder(saltRounds);
 
     public Users addUser(Users user) {
+        String email=user.getEmail();
+        String username=email.substring(0,email.indexOf('@'));
+        user.setUsername(username);
         user.setPassword(encoder.encode(user.getPassword()));
-        return  repo.save(user);
+        Users savedUser=repo.save(user);
+        System.out.println("savedUser= "+savedUser);
+        return savedUser;
     }
 
     public Map<String,Object> verify(Users user) {
@@ -49,7 +54,7 @@ public class UserService {
 
             Map<String, Object> res=new HashMap<>();
             res.put("token",token);
-            res.put("user",userDTO);
+            res.put("userDTO",userDTO);
             return res;
         }
         else

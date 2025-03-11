@@ -2,44 +2,61 @@ import {
     LOGIN_REQUEST,
     LOGIN_SUCCESS,
     LOGIN_FAILURE,
+    SIGNUP_REQUEST,
+    SIGNUP_SUCCESS,
+    SIGNUP_FAILURE,
     LOGOUT
 } from '../actions/authActionTypes';
 
 const initialState = {
     isAuthenticated: localStorage.getItem('authToken') ? true : false,
-    userDTO: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
+    userDTO: localStorage.getItem('userDTO') ? JSON.parse(localStorage.getItem('userDTO')) : null,
     token: localStorage.getItem('authToken') || null,
     loading: false,
-    error: null
+    error: null,
+    signupSuccess: false
 };
 
 const authReducer = (state = initialState, action) => {
     switch (action.type) {
         case LOGIN_REQUEST:
+        case SIGNUP_REQUEST:
             return {
                 ...state,
                 loading: true,
-                error: null
+                error: null,
+                signupSuccess: false
             };
 
         case LOGIN_SUCCESS:
             return {
                 ...state,
                 isAuthenticated: true,
-                userDTO: action.payload.user,
+                userDTO: action.payload.userDTO,
                 token: action.payload.token,
                 loading: false,
                 error: null
             };
+            
+        case SIGNUP_SUCCESS:
+            return {
+                ...state,
+                isAuthenticated: false,
+                loading: false,
+                error: null,
+                signupSuccess: true 
+            };
 
         case LOGIN_FAILURE:
+        case SIGNUP_FAILURE:
             return {
                 ...state,
                 isAuthenticated: false,
                 userDTO: null,
                 token: null,
                 loading: false,
-                error: action.payload
+                error: action.payload,
+                signupSuccess: false
             };
 
         case LOGOUT:
