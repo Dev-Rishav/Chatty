@@ -1,22 +1,23 @@
 import React from 'react';
-import { auth } from '../firebase/setup';
 import { LuLogOut } from "react-icons/lu";
 import { IoMdArrowBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
 import { IoMenuOutline } from 'react-icons/io5';
+import { useDispatch, useSelector } from 'react-redux';
+import man from '../assets/man.png';
+import {logoutUser} from '../redux/actions/authActions';
 
 
-export default function Navbar(props) {
+ export default function Navbar(props) {
+    const dispatch=useDispatch();
 
     const navigate=useNavigate();
+    const {userDTO}=useSelector((state)=>state.auth);
+
+    
 
     const Logout = () => {
-        signOut(auth).then(() => {
-            navigate('/');
-        }).catch((error) => {
-            console.error("Unable to Logout", error);
-        });
+       dispatch(logoutUser());
     }
 
 
@@ -44,13 +45,13 @@ export default function Navbar(props) {
                 </button>
             )} 
                 <div className="flex-shrink-0 flex items-center">
-                {(props.title?.receiverUsername ?? auth.currentUser?.displayName ) &&<img
+                {(props.title?.receiverUsername ?? userDTO?.username ) &&<img
                         className="h-8 w-8 rounded-full object-cover"
-                        src={props.title?.receiverProfileImg ?? auth.currentUser?.photoURL}
+                        src={props.title?.receiverProfileImg ?? userDTO?.ppUrl  ?? man }
                         alt="Profile"
                     />}
                     <h3 className="md:block hidden ml-3 font-medium text-gray-800 text-sm">
-                        {(props.title?.receiverUsername ?? auth.currentUser?.displayName ?? auth.currentUser?.email) || ""}
+                        {(props.title?.receiverUsername ?? userDTO?.username ) || ""}
                     </h3>
                 </div>
             </div>
@@ -60,7 +61,7 @@ export default function Navbar(props) {
                 </h1>
             </div>
             <div className="flex items-center">
-                { (props.title?.receiverUsername ?? auth.currentUser) && <button onClick={Logout} className="flex items-center space-x-1 p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                { (props.title?.receiverUsername ?? userDTO) && <button onClick={Logout} className="flex items-center space-x-1 p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     <LuLogOut className='w-5 h-5'  />
                     <span className='sm:block hidden'>Logout</span>
                 </button>}

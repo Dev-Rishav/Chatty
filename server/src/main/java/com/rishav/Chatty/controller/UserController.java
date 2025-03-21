@@ -1,43 +1,28 @@
 package com.rishav.Chatty.controller;
 
 
+import com.rishav.Chatty.dto.UserDTO;
 import com.rishav.Chatty.entities.Users;
 import com.rishav.Chatty.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.util.List;
 
-@CrossOrigin
 @RestController
+@CrossOrigin
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-
-
-    @PostMapping("/login")
+    @GetMapping("/users")
     @ResponseBody
-    public Map<String, Object> login(@RequestBody Users user) {
-        System.out.println("the incoming object is "+user);
-        return userService.verify(user);
+    public List<UserDTO> getAllUsers(){
+        return userService.getAllUsers();
     }
-
-//    @GetMapping("/login")
-//    @ResponseBody
-//    public String greet(){
-//        return  "Hello";
-//    }
-
-    @PostMapping("/register")
-    @ResponseBody
-    public Users register(@RequestBody  Users user)
-    {
-        System.out.println("teh incoming object is= "+user);
-        return  userService.addUser(user);
-    }
-
-
 
 }

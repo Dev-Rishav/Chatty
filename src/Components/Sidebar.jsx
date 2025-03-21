@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 const Sidebar = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const {isAuthenticated} = useSelector((state) => state.auth);
   const naviagte = useNavigate();
   const { userDTO } = useSelector((state) => state.auth);
 
@@ -19,6 +19,8 @@ const Sidebar = () => {
 
       return;
     }
+
+    //TODO[DONE] create a dto for users list, password also getting fetched.
     try {
       const res = await axios.get("http://localhost:8080/users", {
         headers: {
@@ -32,7 +34,6 @@ const Sidebar = () => {
     }
   };
 
-  //TODO[Done]: is this component stuck in a loop? find out why it repaints multiple times until firebase quota exceeds.
   useEffect(() => {
     if (isAuthenticated) {
       getUser();
@@ -41,7 +42,6 @@ const Sidebar = () => {
     }
   }, [isAuthenticated, naviagte]);
 
-  //todo[DONE]: add filter function so that the current user  does not shows up
 
   return (
     <div className="bg-gray-50 shadow-md h-screen flex flex-col">
@@ -71,9 +71,9 @@ const Sidebar = () => {
                 to="/ChatLayout"
                 className="block text-gray-700 hover:scale-105 duration-300"
                 state={{
-                  id: user.id,
+                  id: user.user_id,
                   username: user.username,
-                  profile_image: user.profile_image,
+                  profile_image: user ?.profile_image,
                 }}
               >
                 <Paper elevation={0} sx={{ border: "2px solid #3d85c6" }}>

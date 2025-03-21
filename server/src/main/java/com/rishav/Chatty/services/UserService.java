@@ -10,10 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -64,7 +61,17 @@ public class UserService {
             return Collections.singletonMap("Message","failure");
     }
 
-    public List<Users> getAllUsers() {
-        return repo.findAll();
+    public List<UserDTO> getAllUsers() {
+
+        List<Users>  allUsers =repo.findAll();
+        List<UserDTO> allUsersDTO=new ArrayList<>();
+        for(int i=0;i<allUsers.size();i++){
+            UserDTO userDTO=new UserDTO();
+            userDTO.setUsername(allUsers.get(i).getUsername());
+            userDTO.setEmail(allUsers.get(i).getEmail());
+            userDTO.setUser_id(allUsers.get(i).getUser_id());
+            allUsersDTO.add(userDTO);
+        }
+        return allUsersDTO;
     }
 }

@@ -2,10 +2,6 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LuPaperclip } from "react-icons/lu";
 import { IoSendSharp } from "react-icons/io5";
-import { addDoc, collection, query, orderBy, onSnapshot, where, or, and } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth, database, storage } from '../firebase/setup';
 import { format } from 'date-fns';
 import { Avatar } from '@mui/material';
 import chatBackgroundSvg from '../assets/chatBG2.svg';
@@ -13,101 +9,102 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
 function Chat() {
+
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
     const [file, setFile] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [showSidebar, setShowSidebar] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const fileRef = useRef(null);
     const messagesEndRef = useRef(null);
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setLoading(false);
-            } else {
-                navigate('/');
-            }
-        });
+    // useEffect(() => {
+    //     const unsubscribe = onAuthStateChanged(auth, (user) => {
+    //         if (user) {
+    //             setLoading(false);
+    //         } else {
+    //             navigate('/');
+    //         }
+    //     });
 
-        return () => unsubscribe();
-    }, [navigate]);
+    //     return () => unsubscribe();
+    // }, [navigate]);
 
     const receiverObj = {
-        receiverProfileImg: location.state?.profile_image,
-        receiverUsername: location.state?.username,
+        // receiverProfileImg: location.state?.profile_image,
+        // receiverUsername: location.state?.username,
     };
 
     const sendMessage = async () => {
-        if (message.trim() === "" && !file) return;
+        // if (message.trim() === "" && !file) return;
 
-        try {
-            let fileUrl = "";
-            if (file) {
-                const storageRef = ref(storage, `chat_files/${Date.now()}_${file.name}`);
-                await uploadBytes(storageRef, file);
-                fileUrl = await getDownloadURL(storageRef);
-            }
+        // try {
+        //     let fileUrl = "";
+        //     if (file) {
+        //         const storageRef = ref(storage, `chat_files/${Date.now()}_${file.name}`);
+        //         await uploadBytes(storageRef, file);
+        //         fileUrl = await getDownloadURL(storageRef);
+        //     }
 
-            const messageData = {
-                message,
-                fileUrl,
-                senderName: auth.currentUser?.displayName,
-                senderId: auth.currentUser?.uid,
-                senderProfilePic: auth.currentUser?.photoURL,
-                receiverId: location.state?.id,
-                timestamp: new Date()
-            };
+        //     const messageData = {
+        //         message,
+        //         fileUrl,
+        //         senderName: auth.currentUser?.displayName,
+        //         senderId: auth.currentUser?.uid,
+        //         senderProfilePic: auth.currentUser?.photoURL,
+        //         receiverId: location.state?.id,
+        //         timestamp: new Date()
+        //     };
 
-            await addDoc(collection(database, "Messages"), messageData);
-            setMessage("");
-            setFile(null);
-        } catch (error) {
-            console.error("Error sending message:", error);
-        }
+        //     await addDoc(collection(database, "Messages"), messageData);
+        //     setMessage("");
+        //     setFile(null);
+        // } catch (error) {
+        //     console.error("Error sending message:", error);
+        // }
     };
 
-    const fetchMessages = useCallback(() => {
-        if (!auth.currentUser || !location.state?.id) {
-            console.log('Missing current user or receiver id');
-            return () => { };
-        }
+    // const fetchMessages = useCallback(() => {
+    //     if (!auth.currentUser || !location.state?.id) {
+    //         console.log('Missing current user or receiver id');
+    //         return () => { };
+    //     }
 
-        const messagesRef = collection(database, "Messages");
-        const q = query(
-            messagesRef,
-            or(
-                and(
-                    where('senderId', '==', auth.currentUser.uid),
-                    where('receiverId', '==', location.state.id)
-                ),
-                and(
-                    where('senderId', '==', location.state.id),
-                    where('receiverId', '==', auth.currentUser.uid)
-                )
-            ),
-            orderBy("timestamp", "asc")
-        );
+    //     const messagesRef = collection(database, "Messages");
+    //     const q = query(
+    //         messagesRef,
+    //         or(
+    //             and(
+    //                 where('senderId', '==', auth.currentUser.uid),
+    //                 where('receiverId', '==', location.state.id)
+    //             ),
+    //             and(
+    //                 where('senderId', '==', location.state.id),
+    //                 where('receiverId', '==', auth.currentUser.uid)
+    //             )
+    //         ),
+    //         orderBy("timestamp", "asc")
+    //     );
 
-        return onSnapshot(q, (querySnapshot) => {
-            const fetchedMessages = querySnapshot.docs.map(doc => ({
-                ...doc.data(),
-                id: doc.id
-            }));
-            setMessages(fetchedMessages);
-        }, (error) => {
-            console.error("Error fetching messages:", error);
-        });
-    }, [location.state?.id]);
+    //     return onSnapshot(q, (querySnapshot) => {
+    //         const fetchedMessages = querySnapshot.docs.map(doc => ({
+    //             ...doc.data(),
+    //             id: doc.id
+    //         }));
+    //         setMessages(fetchedMessages);
+    //     }, (error) => {
+    //         console.error("Error fetching messages:", error);
+    //     });
+    // }, [location.state?.id]);
 
-    useEffect(() => {
-        if (!loading && auth.currentUser && location.state?.id) {
-            const unsubscribe = fetchMessages();
-            return () => unsubscribe();
-        }
-    }, [loading, location.state, fetchMessages]);
+    // useEffect(() => {
+    //     if (!loading && auth.currentUser && location.state?.id) {
+    //         const unsubscribe = fetchMessages();
+    //         return () => unsubscribe();
+    //     }
+    // }, [loading, location.state, fetchMessages]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
