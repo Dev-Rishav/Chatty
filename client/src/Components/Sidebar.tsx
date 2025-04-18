@@ -5,22 +5,40 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const Sidebar = () => {
-  const [users, setUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const {isAuthenticated} = useSelector((state) => state.auth);
-  const naviagte = useNavigate();
-  const { userDTO } = useSelector((state) => state.auth);
+// Define types for the userDTO and state
+interface User {
+  user_id: string;
+  username: string;
+  profile_image: string;
+}
+
+interface RootState {
+  auth: {
+    isAuthenticated: boolean;
+    userDTO: {
+      user_id: string;
+      username: string;
+    };
+  };
+}
+
+const Sidebar: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  
+  // Use the proper types from the Redux store
+  const { isAuthenticated, userDTO } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const navigate = useNavigate();
 
   const getUser = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) {
       console.log("Token not found");
-
       return;
     }
 
-    //TODO[DONE] create a dto for users list, password also getting fetched.
     try {
       const res = await axios.get("http://localhost:8080/allUsers", {
         headers: {
@@ -38,10 +56,9 @@ const Sidebar = () => {
     if (isAuthenticated) {
       getUser();
     } else {
-      naviagte("/auth");
+      navigate("/auth");
     }
-  }, [isAuthenticated, naviagte]);
-
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="bg-gray-50 shadow-md h-screen flex flex-col">
@@ -73,7 +90,7 @@ const Sidebar = () => {
                 state={{
                   id: user.user_id,
                   username: user.username,
-                  profile_image: user ?.profile_image,
+                  profile_image: user?.profile_image,
                 }}
               >
                 <Paper elevation={0} sx={{ border: "2px solid #3d85c6" }}>
@@ -97,4 +114,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-//TODO[DONE]: write searching logic for to find the chats.

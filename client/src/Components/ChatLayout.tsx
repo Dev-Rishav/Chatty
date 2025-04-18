@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import Chat from './Chat';
 import Sidebar from './Sidebar';
 
-function ChatLayout() {
-    const [showSidebar, setShowSidebar] = useState(false);
+const ChatLayout: React.FC = () => {
+    const [showSidebar, setShowSidebar] = useState<boolean>(false);
 
     return (
-        <>
         <div className="flex h-screen">
             {showSidebar && (
                 <div className="w-1/4 min-w-[250px]">
@@ -17,8 +16,7 @@ function ChatLayout() {
                 <Chat showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
             </div>
         </div>
-        </>
     );
-}
+};
 
 export default ChatLayout;
