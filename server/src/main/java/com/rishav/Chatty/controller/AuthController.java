@@ -28,7 +28,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseBody
-    public Users register(@RequestBody  Users user)
+    public Map<String,String> register(@RequestBody  Users user)
     {
         System.out.println("teh incoming object is= "+user);
         return  userService.addUser(user);
