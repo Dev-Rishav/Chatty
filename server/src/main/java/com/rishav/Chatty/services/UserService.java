@@ -27,14 +27,42 @@ public class UserService {
 
     private BCryptPasswordEncoder encoder=new BCryptPasswordEncoder(saltRounds);
 
-    public Users addUser(Users user) {
-        String email=user.getEmail();
-        String username=email.substring(0,email.indexOf('@'));
-        user.setUsername(username);
-        user.setPassword(encoder.encode(user.getPassword()));
-        Users savedUser=repo.save(user);
-        System.out.println("savedUser= "+savedUser);
-        return savedUser;
+    public Map<String, String> addUser(Users user) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            // Validate email
+            String email = user.getEmail();
+            if (email == null || !email.contains("@")) {
+                response.put("status", "error");
+                response.put("message", "Invalid email address");
+                return response;
+            }
+
+            // Check if user already exists
+            Users existingUser = repo.findByEmail(email);
+            if (existingUser != null) {
+                response.put("status", "error");
+                response.put("message", "User with this email already exists");
+                return response;
+            }
+
+            // Generate username from email
+            String username = email.substring(0, email.indexOf('@'));
+            user.setUsername(username);
+
+            // Encrypt password
+            user.setPassword(encoder.encode(user.getPassword()));
+
+            // Save user
+            repo.save(user);
+            response.put("status", "success");
+            response.put("message", "User registered successfully");
+            return response;
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "An unexpected error occurred: " + e.getMessage());
+            return response;
+        }
     }
 
     public Map<String,Object> verify(Users user) {

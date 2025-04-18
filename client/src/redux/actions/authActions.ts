@@ -54,9 +54,16 @@ export const loginUser = (credentials: Credentials) => async (dispatch: AppDispa
 export const registerUser = (credentials: Credentials) => async (dispatch: AppDispatch) => {
   dispatch({ type: SIGNUP_REQUEST });
   try {
-    await axios.post('http://localhost:8080/register', credentials);
+    const res=await axios.post('http://localhost:8080/register', credentials);
 
-    toast.success(`Registration successful! Please login with your credentials.`);
+    if(res.data?.status === "error"){
+      toast.error(res.data.message)
+      return
+    }
+
+    toast(res.data?.message);
+    
+
     dispatch({
       type: SIGNUP_SUCCESS,
       payload: { message: 'Registration successful' },
