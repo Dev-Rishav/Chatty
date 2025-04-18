@@ -3,7 +3,7 @@ import Main from "./Components/Main";
 import ChatLayout from "./Components/ChatLayout";
 // import Landing from './Components/Landing'
 // import Login from './Components/Login'
-import Auth from "./Components/Auth";
+import Auth from "./Components/Auth.tsx";
 import { Provider } from "react-redux";
 import AuthStatus from "./redux/AuthStatus";
 import store from "./redux/store";

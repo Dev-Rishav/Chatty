@@ -1,11 +1,11 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from './hooks';
 import { logoutUser } from './actions/authActions';
 import { useNavigate } from 'react-router-dom';
 
-const AuthStatus = () => {
-  const { isAuthenticated, user } = useSelector(state => state.auth);
-  const dispatch = useDispatch();
+const AuthStatus: React.FC = () => {
+  const { isAuthenticated, userDTO } = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -17,7 +17,7 @@ const AuthStatus = () => {
     <div>
       {isAuthenticated ? (
         <>
-          <span>Welcome, {user?.name}</span>
+          <span>Welcome, {userDTO?.name}</span>
           <button onClick={handleLogout}>Logout</button>
         </>
       ) : (
