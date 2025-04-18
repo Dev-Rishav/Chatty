@@ -9,6 +9,7 @@ import AuthStatus from "./redux/AuthStatus";
 import store from "./redux/store";
 import PrivateRoute from "./redux/PrivateRoute";
 import { Toaster } from "react-hot-toast";
+import Test from "./Components/Test";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Toaster/>
         <AuthStatus />
         <Routes>
+          <Route path="/Test" element={<Test />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Auth />} />
           {/* Private Route */}
