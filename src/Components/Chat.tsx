@@ -7,104 +7,38 @@ import { Avatar } from '@mui/material';
 import chatBackgroundSvg from '../assets/chatBG2.svg';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+import { ReceiverObj } from '../interfaces/types';
 
-function Chat() {
+interface Message {
+    id: string;
+    senderId: string;
+    senderName: string;
+    senderProfilePic?: string;
+    message: string;
+    timestamp: any; 
+    fileUrl?: string;
+}
 
-    const [message, setMessage] = useState("");
-    const [messages, setMessages] = useState([]);
-    const [file, setFile] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [showSidebar, setShowSidebar] = useState(false);
+
+const Chat: React.FC = () => {
+    const [message, setMessage] = useState<string>("");
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [file, setFile] = useState<File | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [showSidebar, setShowSidebar] = useState<boolean>(false);
     const location = useLocation();
     const navigate = useNavigate();
-    const fileRef = useRef(null);
-    const messagesEndRef = useRef(null);
+    const fileRef = useRef<HTMLInputElement | null>(null);
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-    // useEffect(() => {
-    //     const unsubscribe = onAuthStateChanged(auth, (user) => {
-    //         if (user) {
-    //             setLoading(false);
-    //         } else {
-    //             navigate('/');
-    //         }
-    //     });
-
-    //     return () => unsubscribe();
-    // }, [navigate]);
-
-    const receiverObj = {
+    const receiverObj: ReceiverObj = {
         // receiverProfileImg: location.state?.profile_image,
         // receiverUsername: location.state?.username,
     };
 
     const sendMessage = async () => {
-        // if (message.trim() === "" && !file) return;
-
-        // try {
-        //     let fileUrl = "";
-        //     if (file) {
-        //         const storageRef = ref(storage, `chat_files/${Date.now()}_${file.name}`);
-        //         await uploadBytes(storageRef, file);
-        //         fileUrl = await getDownloadURL(storageRef);
-        //     }
-
-        //     const messageData = {
-        //         message,
-        //         fileUrl,
-        //         senderName: auth.currentUser?.displayName,
-        //         senderId: auth.currentUser?.uid,
-        //         senderProfilePic: auth.currentUser?.photoURL,
-        //         receiverId: location.state?.id,
-        //         timestamp: new Date()
-        //     };
-
-        //     await addDoc(collection(database, "Messages"), messageData);
-        //     setMessage("");
-        //     setFile(null);
-        // } catch (error) {
-        //     console.error("Error sending message:", error);
-        // }
+        // Implement send message logic here
     };
-
-    // const fetchMessages = useCallback(() => {
-    //     if (!auth.currentUser || !location.state?.id) {
-    //         console.log('Missing current user or receiver id');
-    //         return () => { };
-    //     }
-
-    //     const messagesRef = collection(database, "Messages");
-    //     const q = query(
-    //         messagesRef,
-    //         or(
-    //             and(
-    //                 where('senderId', '==', auth.currentUser.uid),
-    //                 where('receiverId', '==', location.state.id)
-    //             ),
-    //             and(
-    //                 where('senderId', '==', location.state.id),
-    //                 where('receiverId', '==', auth.currentUser.uid)
-    //             )
-    //         ),
-    //         orderBy("timestamp", "asc")
-    //     );
-
-    //     return onSnapshot(q, (querySnapshot) => {
-    //         const fetchedMessages = querySnapshot.docs.map(doc => ({
-    //             ...doc.data(),
-    //             id: doc.id
-    //         }));
-    //         setMessages(fetchedMessages);
-    //     }, (error) => {
-    //         console.error("Error fetching messages:", error);
-    //     });
-    // }, [location.state?.id]);
-
-    // useEffect(() => {
-    //     if (!loading && auth.currentUser && location.state?.id) {
-    //         const unsubscribe = fetchMessages();
-    //         return () => unsubscribe();
-    //     }
-    // }, [loading, location.state, fetchMessages]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -165,7 +99,7 @@ function Chat() {
                     <div className='relative z-20 p-4 bg-gray-100'>
                         <div className='flex items-center'>
                             <button 
-                                onClick={() => fileRef.current.click()} 
+                                onClick={() => fileRef.current?.click()} 
                                 className='p-2 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
                             >
                                 <LuPaperclip className='w-6 h-6 text-gray-700' />
@@ -174,7 +108,7 @@ function Chat() {
                                 type="file" 
                                 ref={fileRef} 
                                 className='hidden' 
-                                onChange={(e) => setFile(e.target.files[0])} 
+                                onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} 
                             />
                             <input 
                                 type="text" 

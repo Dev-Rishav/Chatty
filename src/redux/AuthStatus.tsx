@@ -17,8 +17,8 @@ const AuthStatus: React.FC = () => {
     <div>
       {isAuthenticated ? (
         <>
-          <span>Welcome, {userDTO?.name}</span>
-          <button onClick={handleLogout}>Logout</button>
+          <span>Welcome, {userDTO?.username},,,,,</span>
+          <button  onClick={handleLogout}>Logout</button>
         </>
       ) : (
         <span>Please log in</span>
