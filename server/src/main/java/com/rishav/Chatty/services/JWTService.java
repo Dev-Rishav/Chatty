@@ -19,7 +19,7 @@ import java.util.function.Function;
 @Service
 public class JWTService {
 
-    private String secretKey="";
+    private String secretKey="my_super_secure_and_long_secret_key_yinYang";
 
     public JWTService(){
         try {
@@ -38,9 +38,10 @@ public class JWTService {
         return Jwts.builder()
                 .claims()
                 .add(claims)
+//                .setClaims(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 *60*30))
+                .expiration(new Date(System.currentTimeMillis() + 60 *60*1000*24))
                 .and()
                 .signWith(getKey())
                 .compact();
