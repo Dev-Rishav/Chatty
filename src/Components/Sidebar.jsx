@@ -22,7 +22,7 @@ const Sidebar = () => {
 
     //TODO[DONE] create a dto for users list, password also getting fetched.
     try {
-      const res = await axios.get("http://localhost:8080/users", {
+      const res = await axios.get("http://localhost:8080/allUsers", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
