@@ -1,3 +1,5 @@
+package com.rishav.Chatty.controller;
+
 import com.rishav.Chatty.entities.Message;
 import com.rishav.Chatty.services.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +24,10 @@ public class MessageController {
 
     @GetMapping("/between")
     public ResponseEntity<List<Message>> getMessagesBetweenUsers(
-            @RequestParam int user1,
-            @RequestParam int user2) {
-        List<Message> messages = messageService.getMessagesBetweenUsers(user1, user2);
+            @RequestParam String user) {
+        System.out.println(" user2= "+user);
+        List<Message> messages = messageService.getMessagesBetweenUsers(user);
+        System.out.println("messages= "+messages);
         return ResponseEntity.ok(messages);
     }
 }

@@ -25,16 +25,19 @@ const Chat: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [showSidebar, setShowSidebar] = useState<boolean>(false);
+    const [showSidebar, setShowSidebar] = useState<boolean>(true);
     const location = useLocation();
     const navigate = useNavigate();
     const fileRef = useRef<HTMLInputElement | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
     const receiverObj: ReceiverObj = {
-        // receiverProfileImg: location.state?.profile_image,
-        // receiverUsername: location.state?.username,
+        receiverProfileImg: location.state?.profile_image,
+        receiverUsername: location.state?.username,
+        receiverId: location.state?.id,
     };
+    // console.log(receiverObj);
+    
 
     const sendMessage = async () => {
         // Implement send message logic here

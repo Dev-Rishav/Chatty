@@ -1,5 +1,6 @@
 export interface ReceiverObj {
     receiverProfileImg?: string;
-    receiverUsername?: string;
+    receiverUsername: string;
+    receiverId:string
   }
   
