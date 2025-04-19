@@ -4,3 +4,12 @@ export interface ReceiverObj {
     receiverId:string
   }
   
+
+export interface Message {
+  id: number;
+  sender: string;
+  receiver:string,
+  content: string;
+  timestamp: any; 
+  fileUrl?: string;
+}
