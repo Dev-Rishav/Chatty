@@ -16,10 +16,11 @@ const Test2 = () => {
     stompClient.current.connect({}, (frame) => {
       console.log("Connected: ", frame);
 
-      stompClient.current?.subscribe("/user/queue/messages", (message) => {
-        const payload = JSON.parse(message.body);
-        console.log("Received:", payload);
-        alert(`Received: ${payload.content}`);
+      stompClient.current?.subscribe("/user/queue/messages", (payload) => {
+        // const payload = JSON.parse(message.body);
+        const message = JSON.parse(payload.body);
+        console.log("Received:", message);
+        alert(`Received: ${message.content}`);
       });
 
       // Example send
@@ -28,7 +29,7 @@ const Test2 = () => {
         {},
         JSON.stringify({
           content: "Hello from React!",
-          to: "t", // Change this to a valid username or userId on your backend
+          to: "t@t.com", // Change this to a valid username or userId on your backend
         })
       );
     });
