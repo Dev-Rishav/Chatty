@@ -27,21 +27,17 @@ public class ChatController {
         System.out.println("Received message: " + message.toString());
         // Save to DB
         Message msg = new Message();
-        msg.setSender(message.getFrom());
+        msg.setSender(principal.getName());
         msg.setReceiver(message.getTo());
         msg.setContent(message.getContent());
         messageRepository.save(msg);
 
+        System.out.println("Saved message to DB: "+msg);
         // Send to recipient
         messagingTemplate.convertAndSendToUser(
                 message.getTo(),
                 "/queue/messages",
-                message
-        );// Assume `message.getTo()` is recipient username
-        messagingTemplate.convertAndSendToUser(
-                message.getTo(), // username
-                "/queue/messages", // destination
-                message
+                message.getContent()
         );
     }
 }

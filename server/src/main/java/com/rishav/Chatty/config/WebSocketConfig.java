@@ -6,8 +6,10 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import java.security.Principal;
 import java.util.Map;
@@ -16,15 +18,16 @@ import java.util.Map;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final CustomHandshakeHandler customHandshakeHandler;
+
+    public WebSocketConfig(CustomHandshakeHandler customHandshakeHandler) {
+        this.customHandshakeHandler = customHandshakeHandler;
+    }
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setHandshakeHandler(new DefaultHandshakeHandler() {
-                    @Override
-                    protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-                        return () -> "testUser"; // Temporary hardcoded username
-                    }
-                })
+                .setHandshakeHandler(customHandshakeHandler)
                 .setAllowedOriginPatterns("http://localhost:5173").withSockJS();
     }
 
