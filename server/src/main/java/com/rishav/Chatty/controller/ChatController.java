@@ -1,45 +1,54 @@
 package com.rishav.Chatty.controller;
 
 
+import com.rishav.Chatty.dto.ChatMessageDTO;
+import com.rishav.Chatty.dto.UserDTO;
 import com.rishav.Chatty.entities.Message;
-import com.rishav.Chatty.entities.Room;
-import com.rishav.Chatty.payload.MessageRequest;
-import com.rishav.Chatty.repo.RoomRepo;
+import com.rishav.Chatty.repo.MessageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@CrossOrigin("http://localhost:5173")
+import java.security.Principal;
+import java.sql.Timestamp;
+import java.util.Map;
+
+@RestController
 public class ChatController {
+
     @Autowired
-    private RoomRepo roomRepo;
+    private SimpMessagingTemplate messagingTemplate;
 
-    //for sending and receiving addresses
-    //this method will take the message as args from client and return value will be published to desired topic
-    @MessageMapping("/sendMessage/{roomId}")    //app/sendMessage/{roomId}
-    @SendTo("/topic/room/{roomId}") //subscribe
+    @Autowired
+    private MessageRepo messageRepository;
 
-    public Message sendMessage(@DestinationVariable String roomId,  //check the differences between destination var and path var
-                               @RequestBody MessageRequest request){
-        Room room = roomRepo.findByRoomId(request.getRoomId());
-        Message message=new Message();
-        message.setContent(request.getContent());
-        message.setSenderId(request.getSender());
-        if(room!=null){
-            room.getMessages().add(message);
-            roomRepo.save(room);
-        }else {
-            throw new RuntimeException("Room not found!");
-        }
-        return  message;
+    @MessageMapping("/private-message")
+    public void sendPrivateMessage(@Payload ChatMessageDTO message, Principal principal) {
+        System.out.println("Received message: " + message.toString());
+        // Save to DB
+        Message msg = new Message();
+        msg.setSender(principal.getName());
+        msg.setReceiver(message.getTo());
+        msg.setContent(message.getContent());
+        messageRepository.save(msg);
+
+//        Map<UserDTO, String> userDTOMap = Map.of()
+        ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
+        chatMessageDTO.setTo(message.getTo());
+        chatMessageDTO.setFrom(principal.getName());    //get the emailId from principal
+        chatMessageDTO.setContent(message.getContent());
+
+        System.out.println("Saved message to DB: "+msg);
+        // Send to recipient
+        messagingTemplate.convertAndSendToUser(
+                message.getTo(),
+                "/queue/messages",
+//                message.getContent()
+//                Map.of("content",message.getContent())
+                chatMessageDTO
+        );
     }
-
-
 }
+

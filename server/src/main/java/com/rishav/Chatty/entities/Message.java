@@ -1,26 +1,29 @@
 package com.rishav.Chatty.entities;
 
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import jakarta.persistence.*;
+import lombok.*;
+import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "messages")
+@ToString
+@Entity
 public class Message {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String senderId;
-    private String receiverId;
-    private String messageType;
+    private String sender;
+    private String receiver;
     private String content;
+    private LocalDateTime timestamp;
 
-    private boolean isRead=false;
-    private LocalDateTime timeStamp=LocalDateTime.now();
+    @PrePersist
+    protected void onCreate() {
+        timestamp = LocalDateTime.now();
+    }
 }
+

@@ -8,16 +8,11 @@ import chatBackgroundSvg from '../assets/chatBG2.svg';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { ReceiverObj } from '../interfaces/types';
-
-interface Message {
-    id: string;
-    senderId: string;
-    senderName: string;
-    senderProfilePic?: string;
-    message: string;
-    timestamp: any; 
-    fileUrl?: string;
-}
+import {Message} from '../interfaces/types';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+import fetchAllMessages from '../utility/fetchAllMessages';
+import { formatDistanceToNow } from "date-fns";
 
 
 const Chat: React.FC = () => {
@@ -25,16 +20,43 @@ const Chat: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [showSidebar, setShowSidebar] = useState<boolean>(false);
+    const [showSidebar, setShowSidebar] = useState<boolean>(true);
     const location = useLocation();
     const navigate = useNavigate();
     const fileRef = useRef<HTMLInputElement | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const currentUser=useSelector((state:RootState) => state.auth.userDTO);
+    const token=useSelector((state:RootState)=>state.auth.token);
+    if(token===null){
+        console.log("Token not found");
+        navigate("/auth");
+        return;
+    }
+
 
     const receiverObj: ReceiverObj = {
-        // receiverProfileImg: location.state?.profile_image,
-        // receiverUsername: location.state?.username,
+        receiverProfileImg: location.state?.profile_image,
+        receiverUsername: location.state?.username,
+        receiverId: location.state?.id,
     };
+
+
+    const fetchPreviousMessages = async () => {
+        try {
+          const msgArray: Message[] = await fetchAllMessages(token, receiverObj.receiverId);
+          setMessages(msgArray);
+          console.log("Messages:", JSON.stringify(msgArray, null, 2));
+        } catch (error) {
+          console.error("❌ Failed to fetch messages:", error);
+        }
+      };
+
+    useEffect(() => {
+        fetchPreviousMessages();
+    },[receiverObj.receiverId]);
+
+    // console.log(receiverObj);
+    
 
     const sendMessage = async () => {
         // Implement send message logic here
@@ -75,20 +97,21 @@ const Chat: React.FC = () => {
                         ></div>
                         <div className='relative z-20 h-full overflow-y-auto p-4 scroll-smooth'>
                             {messages.map((msg) => (
-                                <div key={msg.id} className={`flex items-start mb-4 ${msg.senderId === auth.currentUser?.uid ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <div key={msg.id} className={`flex items-start mb-4 ${msg.sender === currentUser?.email ? 'flex-row-reverse' : 'flex-row'}`}>
                                     <Avatar
                                         src={msg.senderProfilePic || 'default-avatar-url.jpg'}
-                                        alt={msg.senderName}
-                                        className={`w-8 h-8 ${msg.senderId === auth.currentUser?.uid ? 'ml-2' : 'mr-2'}`}
+                                        alt={msg.sender}
+                                        className={`w-8 h-8 ${msg.sender === currentUser?.email ? 'ml-2' : 'mr-2'}`}
                                     />
-                                    <div className={`max-w-[50%] ${msg.senderId === auth.currentUser?.uid ? 'bg-cyan-200 text-gray-700' : 'bg-slate-600 text-gray-200'} rounded-lg p-3 shadow-lg`}>
+                                    <div className={`max-w-[50%] ${msg.sender === currentUser?.email ? 'bg-cyan-200 text-gray-700' : 'bg-slate-600 text-gray-200'} rounded-lg p-3 shadow-lg`}>
                                         <p className="font-semibold mb-1 ">
-                                            {msg.senderName}
+                                            {/* {msg.senderName? msg.senderName : msg.sender} */}
+                                            {msg.sender === currentUser?.email ? currentUser?.username : receiverObj.receiverUsername}
                                             <span className="text-xs ml-2">
-                                                {format(msg.timestamp.toDate(), 'h:mm a')}
+                                            {formatDistanceToNow(new Date(msg.timestamp), { addSuffix: true })}
                                             </span>
                                         </p>
-                                        <p className=''>{msg.message}</p>
+                                        <p className=''>{msg.content}</p>
                                         {msg.fileUrl && <img src={msg.fileUrl} alt="file" className="mt-2" />}
                                     </div>
                                 </div>

@@ -1,35 +1,33 @@
 package com.rishav.Chatty.controller;
 
-
 import com.rishav.Chatty.entities.Message;
 import com.rishav.Chatty.services.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.messaging.handler.annotation.MessageMapping;
-//import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-//this controller will handle one to one private chat request
 @RestController
-@RequestMapping("api/messages")
+@RequestMapping("/api/messages")
 public class MessageController {
 
-    @Autowired
-    private MessageService messageService;
+    private final MessageService messageService;
 
-    @MessageMapping("/sendMessage")
-    @SendToUser("/queue/reply")
-    public Message sendMessage(@RequestBody Message message){
-        System.out.println("yes this is qwo");
-        return  messageService.sendMessage(message);
+    @Autowired
+    public MessageController(MessageService messageService) {
+        this.messageService = messageService;
     }
 
-//    @GetMapping("/private/{userId}")
-//    public List<Message> getPrivateMessages(@PathVariable String userId) {
-//        return messageService.getPrivateMessages(userId);
-//    }
-
+    @GetMapping("/between")
+    public ResponseEntity<List<Message>> getMessagesBetweenUsers(
+            @RequestParam String user) {
+        System.out.println(" user2= "+user);
+        List<Message> messages = messageService.getMessagesBetweenUsers(user);
+        System.out.println("messages= "+messages);
+        return ResponseEntity.ok(messages);
+    }
 }

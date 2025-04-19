@@ -8,8 +8,9 @@ import { useSelector } from "react-redux";
 // Define types for the userDTO and state
 interface User {
   user_id: string;
+  email: string;
   username: string;
-  profile_image: string;
+  profile_image?: string;
 }
 
 interface RootState {
@@ -88,7 +89,7 @@ const Sidebar: React.FC = () => {
                 to="/ChatLayout"
                 className="block text-gray-700 hover:scale-105 duration-300"
                 state={{
-                  id: user.user_id,
+                  id: user.email,
                   username: user.username,
                   profile_image: user?.profile_image,
                 }}

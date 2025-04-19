@@ -1,32 +1,40 @@
 package com.rishav.Chatty.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
+
+import java.security.Principal;
+import java.util.Map;
 
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        //this specifies that in which endpoint the client will communicate with
-        registry.addEndpoint("/chat")   //connection establishment
-                .setAllowedOrigins("http://localhost:5173")
-                .withSockJS();  //enables the web socket fall back mechanism, basically if the web socket protocol starts acting up then it provides alternative approaches
+    private final CustomHandshakeHandler customHandshakeHandler;
+
+    public WebSocketConfig(CustomHandshakeHandler customHandshakeHandler) {
+        this.customHandshakeHandler = customHandshakeHandler;
     }
 
-    //messageBroker is intermediate thingy to route messages
     @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+                .setHandshakeHandler(customHandshakeHandler)
+                .setAllowedOriginPatterns("http://localhost:5173").withSockJS();
+    }
 
-        config.enableSimpleBroker("/topic", "/queue"); // "/topic" -> rooms, "/queue" -> private chats
-        config.setApplicationDestinationPrefixes("/app");
-        config.setUserDestinationPrefix("/user"); // Enables private message queues
-        /// app/chat
-        //server-side: @MessagingMapping("/chat)
-
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.enableSimpleBroker("/topic", "/queue");
+        registry.setApplicationDestinationPrefixes("/app");
+        registry.setUserDestinationPrefix("/user");
     }
 }

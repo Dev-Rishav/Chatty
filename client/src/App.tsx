@@ -11,6 +11,7 @@ import store from './redux/store';
 import PrivateRoute from './redux/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
 import Test from './Components/Test';
+import Test2 from './Components/Test2';
 
 const App: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const App: React.FC = () => {
         <AuthStatus />
         <Routes>
           <Route path="/Test" element={<Test />} />
+          <Route path="/Test2" element={<Test2 />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Auth />} />
           {/* Private Route */}
