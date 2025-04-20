@@ -7,8 +7,8 @@ export interface ReceiverObj {
 
 export interface Message {
   id: number;
-  sender: string;
-  receiver:string,
+  from: string;
+  to:string,
   content: string;
   timestamp: any; 
   fileUrl?: string;

@@ -13,11 +13,13 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import fetchAllMessages from '../utility/fetchAllMessages';
 import { formatDistanceToNow } from "date-fns";
+import stompService from '../services/stompService';
+import toast from 'react-hot-toast';
 
 
 const Chat: React.FC = () => {
-    const [message, setMessage] = useState<string>("");
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [newMessage, setNewMessage] = useState<string>("");
+    const [messages, setMessages] = useState<Message[] | null>([]);
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [showSidebar, setShowSidebar] = useState<boolean>(true);
@@ -27,25 +29,27 @@ const Chat: React.FC = () => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const currentUser=useSelector((state:RootState) => state.auth.userDTO);
     const token=useSelector((state:RootState)=>state.auth.token);
-    if(token===null){
+    if(token===null || currentUser===null){
         console.log("Token not found");
         navigate("/auth");
         return;
     }
 
-
+    //store state
     const receiverObj: ReceiverObj = {
         receiverProfileImg: location.state?.profile_image,
         receiverUsername: location.state?.username,
         receiverId: location.state?.id,
     };
 
-
+    //chat history
     const fetchPreviousMessages = async () => {
         try {
-          const msgArray: Message[] = await fetchAllMessages(token, receiverObj.receiverId);
+          const msgArray: Message[] | null = await fetchAllMessages(token, receiverObj.receiverId);
           setMessages(msgArray);
-          console.log("Messages:", JSON.stringify(msgArray, null, 2));
+        //   console.log("Messages:", JSON.stringify(msgArray, null, 2));
+        //   console.log("Receiver ID:", msgArray[0]?.receiver);
+          
         } catch (error) {
           console.error("❌ Failed to fetch messages:", error);
         }
@@ -57,10 +61,80 @@ const Chat: React.FC = () => {
 
     // console.log(receiverObj);
     
-
+    //send message
     const sendMessage = async () => {
         // Implement send message logic here
+        if (newMessage.trim() === "" ) return;
+        stompService.send("/app/private-message", {
+            content: newMessage,
+            to: receiverObj.receiverId,
+        });
+        setNewMessage("");
+        setFile(null);
+        const messageToSend: Message = {
+            id: Date.now(), // Temporary ID until the backend sends a real one
+            content: newMessage,
+            from: currentUser.email,
+            to: receiverObj.receiverId,
+            timestamp: new Date().toISOString(),
+          };
+          setMessages((prevMessages) => [...prevMessages,messageToSend]);
+
     };
+
+    //event listeners for new messages
+    useEffect(() => {
+      
+        if (!stompService.isConnected()) {
+          stompService.connect(token, () => {
+            stompService.subscribe("/user/queue/messages", (payload:any) => {
+            console.log("Message received:", payload);
+            if(payload.from === receiverObj.receiverId){ 
+            setMessages((prevMessages) => {
+                const message: Message = {
+                    id: Date.now(), // Temporary ID until the backend sends a real one
+                    content: payload.content,
+                    from: payload.from,
+                    to: payload.to,
+                    timestamp: new Date().toISOString(),
+                };
+                // console.log("Message received:", message);
+                return [...(prevMessages || []), message];
+
+            });
+        }
+            });
+        
+          });
+        } else {
+          stompService.subscribe("/user/queue/messages", (payload:any) => {
+            if(payload.from === receiverObj.receiverId){    //bind it with the current message only if the sender is the current receiver
+            setMessages((prevMessages) => {
+                const message: Message = {
+                    id: Date.now(), // Temporary ID until the backend sends a real one
+                    content: payload.content,
+                    from: payload.from,
+                    to: payload.to,
+                    timestamp: new Date().toISOString(),
+                };
+                console.log("Message received:", message);
+                return [...(prevMessages || []), message];
+
+
+            });     
+        }      
+            // const message = JSON.parse(payload.body);
+            toast.success("💬 Got message:",payload.content);
+          });
+        }
+      
+        return () => {
+          stompService.unsubscribe("/user/queue/messages");
+        };
+      }, []);
+      
+
+
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -95,18 +169,22 @@ const Chat: React.FC = () => {
                                 opacity: 0.5,
                             }}
                         ></div>
-                        <div className='relative z-20 h-full overflow-y-auto p-4 scroll-smooth'>
+                        {/* chat block */}
+                        <div className='relative z-20 h-full overflow-y-auto p-4 scroll-smooth '>
+                        {(!messages || messages.length === 0) ? (
+        <p className="text-center text-gray-700 italic mt-4 ">Start a conversation...</p>
+                            ):(
+                            <>
                             {messages.map((msg) => (
-                                <div key={msg.id} className={`flex items-start mb-4 ${msg.sender === currentUser?.email ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <div key={msg.id} className={`flex items-start mb-4 ${msg.from === currentUser?.email ? 'flex-row-reverse' : 'flex-row'}`}>
                                     <Avatar
-                                        src={msg.senderProfilePic || 'default-avatar-url.jpg'}
-                                        alt={msg.sender}
-                                        className={`w-8 h-8 ${msg.sender === currentUser?.email ? 'ml-2' : 'mr-2'}`}
+                                        src={(msg.from === currentUser?.email ? currentUser?.ProfilePic : receiverObj.receiverProfileImg) || 'default-avatar-url.jpg'}
+                                        alt={msg.from}
+                                        className={`w-8 h-8 ${msg.from === currentUser?.email ? 'ml-2' : 'mr-2'}`}
                                     />
-                                    <div className={`max-w-[50%] ${msg.sender === currentUser?.email ? 'bg-cyan-200 text-gray-700' : 'bg-slate-600 text-gray-200'} rounded-lg p-3 shadow-lg`}>
+                                    <div className={`max-w-[50%] ${msg.from === currentUser?.email ? 'bg-cyan-200 text-gray-700' : 'bg-slate-600 text-gray-200'} rounded-lg p-3 shadow-lg`}>
                                         <p className="font-semibold mb-1 ">
-                                            {/* {msg.senderName? msg.senderName : msg.sender} */}
-                                            {msg.sender === currentUser?.email ? currentUser?.username : receiverObj.receiverUsername}
+                                            {msg.from === currentUser?.email ? currentUser?.username : receiverObj.receiverUsername}
                                             <span className="text-xs ml-2">
                                             {formatDistanceToNow(new Date(msg.timestamp), { addSuffix: true })}
                                             </span>
@@ -117,8 +195,11 @@ const Chat: React.FC = () => {
                                 </div>
                             ))}
                             <div ref={messagesEndRef} />
+                            </>)}
                         </div>
                     </div>
+
+                      {/* send message box      */}
                     <div className='relative z-20 p-4 bg-gray-100'>
                         <div className='flex items-center'>
                             <button 
@@ -137,9 +218,9 @@ const Chat: React.FC = () => {
                                 type="text" 
                                 className='flex-1 mx-4 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500' 
                                 placeholder='Type a message...' 
-                                value={message} 
-                                onChange={(e) => setMessage(e.target.value)} 
-                                onKeyPress={(e) => e.key === 'Enter' && sendMessage()} 
+                                value={newMessage} 
+                                onChange={(e) => setNewMessage(e.target.value)} 
+                                onKeyUp={(e) => e.key === 'Enter' && sendMessage()} 
                             />
                             <button 
                                 onClick={sendMessage} 
