@@ -1,5 +1,6 @@
 package com.rishav.Chatty.repo;
 
+import com.rishav.Chatty.entities.Chat;
 import com.rishav.Chatty.entities.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,9 +12,14 @@ import java.util.List;
 @Repository
 public interface MessageRepo extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE " +
-            "(m.sender = :user1 AND m.receiver = :user2) OR " +
-            "(m.sender = :user2 AND m.receiver = :user1) " +
+            "(m.sender.email = :user1Email AND m.receiver.email = :user2Email) OR " +
+            "(m.sender.email = :user2Email AND m.receiver.email = :user1Email) " +
             "ORDER BY m.timestamp ASC")
-    List<Message> findChatBetweenUsers(@Param("user1") String user1, @Param("user2") String user2);
+    List<Message> findChatBetweenUsers(@Param("user1Email") String user1Email,
+                                       @Param("user2Email") String user2Email);
 
+
+    List<Message> findByChat_ChatId(int chatId);
+
+    List<Message> findByChat_(Chat chat);
 }
