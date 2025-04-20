@@ -1,3 +1,199 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+  @keyframes paper-fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .paper-container {
+    background: #fffcf5;
+    border: 1px solid #ede4d3;
+    box-shadow: 0 4px 12px rgba(94, 71, 32, 0.1);
+  }
+
+  .shadow-paper {
+    box-shadow: 8px 8px 0 rgba(94, 71, 32, 0.1);
+  }
+
+  .shadow-paper-deep {
+    box-shadow: 12px 12px 0 rgba(94, 71, 32, 0.15);
+  }
+
+  .paper-input {
+    background: #fdfaf4;
+    border: 1px solid #e5d9c3;
+    padding: 10px 16px;
+    font-family: 'Courier New', monospace;
+    transition: all 0.2s ease;
+  }
+
+  .paper-input:focus {
+    outline: none;
+    border-color: #d4c4a8;
+    box-shadow: 0 0 0 2px rgba(180, 148, 94, 0.2);
+  }
+
+  .paper-button {
+    padding: 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background: #f5f1e8;
+    border: 1px solid #e5d9c3;
+  }
+
+  .paper-button:hover {
+    background: #ede4d3;
+  }
+
+  .paper-menu-item {
+    padding: 12px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f5f1e8;
+  }
+
+  .paper-menu-item:hover {
+    background: #faf8f3;
+  }
+
+  .paper-message {
+    background: #fffcf7;
+    border: 1px solid #e5d9c3;
+    box-shadow: 2px 2px 0 rgba(94, 71, 32, 0.05);
+    position: relative;
+  }
+
+  .paper-message::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 20px;
+    width: 12px;
+    height: 12px;
+    background: #fffcf7;
+    transform: rotate(45deg);
+    border-left: 1px solid #e5d9c3;
+    border-top: 1px solid #e5d9c3;
+  }
+
+  .paper-send-button {
+    background: #8a6e4b;
+    color: white;
+    padding: 12px 24px;
+    border: 1px solid #786046;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+  }
+
+  .paper-send-button:hover {
+    background: #786046;
+  }
+
+  .paper-money-input {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding-left: 32px !important;
+  }
+
+  .paper-input-label {
+    display: block;
+    margin-bottom: 6px;
+    font-family: 'Courier New', monospace;
+    color: #786046;
+    font-weight: bold;
+  }
+
+  .paper-send-money-button {
+    background: #4a7860;
+    color: white;
+    padding: 12px 24px;
+    border: 1px solid #3d6452;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+  }
+
+  .paper-cancel-button {
+    background: #f5f1e8;
+    color: #786046;
+    padding: 12px 24px;
+    border: 1px solid #e5d9c3;
+    font-family: 'Courier New', monospace;
+  }
+
+  .paper-container {
+    background: #fffcf5;
+    border: 1px solid #ede4d3;
+    box-shadow: 8px 8px 0 rgba(94, 71, 32, 0.1);
+  }
+
+  .paper-input {
+    background: #fdfaf4;
+    border: 1px solid #e5d9c3;
+    padding: 12px 16px;
+    font-family: 'Crimson Text', serif;
+    color: #786046;
+    transition: all 0.2s ease;
+  }
+
+  .paper-input:focus {
+    outline: none;
+    border-color: #d4c4a8;
+    box-shadow: 0 0 0 2px rgba(180, 148, 94, 0.2);
+  }
+
+  .paper-button-primary {
+    background: #8a6e4b;
+    color: white;
+    padding: 14px;
+    border: 1px solid #786046;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+  }
+
+  .paper-button-primary:hover {
+    background: #786046;
+  }
+
+  .paper-button-secondary {
+    background: #f5f1e8;
+    color: #786046;
+    padding: 12px;
+    border: 1px solid #e5d9c3;
+    font-family: 'Crimson Text', serif;
+    transition: all 0.2s ease;
+  }
+
+  .paper-button-secondary:hover {
+    background: #ede4d3;
+  }
+
+  .paper-button-alternative {
+    background: #fffcf5;
+    color: #786046;
+    padding: 8px 16px;
+    border: 1px solid #e5d9c3;
+    font-family: 'Playfair Display', serif;
+    transition: all 0.2s ease;
+  }
+
+  .paper-button-alternative:hover {
+    background: #f5f1e8;
+  }
+
+  .shadow-paper {
+    box-shadow: 4px 4px 0 rgba(94, 71, 32, 0.1);
+  }
+
+  .shadow-paper-deep {
+    box-shadow: 8px 8px 0 rgba(94, 71, 32, 0.15);
+  }
