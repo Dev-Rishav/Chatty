@@ -119,7 +119,7 @@ return (
       {/* Left Sidebar */}
       <div className="w-96 pr-4 py-6 flex flex-col">
         <div className="paper-container p-6 rounded-sm flex-1 flex flex-col shadow-paper">
-          {/* Top Section */}
+          {/* Top  Section */}
           <div className="flex items-center justify-between mb-8 border-b border-amber-900/20 pb-4">
             <h1 className="text-3xl tracking-wide font-playfair font-bold text-amber-900">
               Chatty

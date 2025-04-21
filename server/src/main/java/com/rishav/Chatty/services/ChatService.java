@@ -3,7 +3,6 @@ package com.rishav.Chatty.services;
 
 import com.rishav.Chatty.dto.ChatDTO;
 import com.rishav.Chatty.dto.ChatMessageDTO;
-import com.rishav.Chatty.dto.UserDTO;
 import com.rishav.Chatty.entities.Chat;
 import com.rishav.Chatty.entities.Message;
 import com.rishav.Chatty.entities.Users;
@@ -77,13 +76,15 @@ public class ChatService {
         msg.setReceiver(receiver);
         msg.setContent(message.getContent());
         msg.setChat(chat);
-        messageRepository.save(msg);
+        msg=messageRepository.save(msg);
 
         // Create a response DTO to send back to the client
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
+        chatMessageDTO.setId(msg.getId());
         chatMessageDTO.setTo(receiverEmail);
         chatMessageDTO.setFrom(senderEmail);  // sender is the email from the principal
         chatMessageDTO.setContent(message.getContent());
+        chatMessageDTO.setTimestamp(msg.getTimestamp());
 
         // Send the message to the recipient via WebSocket
         messagingTemplate.convertAndSendToUser(
@@ -119,7 +120,7 @@ public class ChatService {
 
             ChatDTO dto = new ChatDTO();
 
-            dto.setChatId(chat.getChatId());
+            dto.setId(chat.getChatId());
             dto.setEmail(otherUser.getEmail());
             dto.setUsername(otherUser.getUsername());
             dto.setProfilePic(otherUser.getProfilePic());
