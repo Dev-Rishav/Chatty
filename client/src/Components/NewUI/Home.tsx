@@ -25,68 +25,6 @@ import stompService from "../../services/stompService";
 import toast from "react-hot-toast";
 import uploadFile from "../../utility/uploadFile";
 
-// const dummyChats: Chat[] = [
-//   {
-//     id: 1",
-//     name: "Design Team",
-//     lastMessage: "Let's finalize the UI design.",
-//     timestamp: "2025-04-20T10:30:00Z",
-//     unread: 2,
-//     isGroup: true,
-//     online: true,
-//     avatar: "https://example.com/avatar1.png",
-//   },
-//   {
-//     id: "2",
-//     name: "John Doe",
-//     lastMessage: "See you tomorrow!",
-//     timestamp: "2025-04-20T09:15:00Z",
-//     unread: 0,
-//     isGroup: false,
-//     online: false,
-//     avatar: "https://example.com/avatar2.png",
-//   },
-//   {
-//     id: "3",
-//     name: "Marketing Team",
-//     lastMessage: "Campaign launch is scheduled.",
-//     timestamp: "2025-04-19T18:45:00Z",
-//     unread: 5,
-//     isGroup: true,
-//     online: true,
-//     avatar: "https://example.com/avatar3.png",
-//   },
-// ];
-
-const dummyMessages: Message[] = [
-  {
-    id: 1101,
-    from: "Alice",
-    to: "Bob",
-    content: "Let's create something amazing together! 🎨",
-    timestamp: "2025-04-20T10:30:00Z",
-    reactions: { "👍": 2, "❤️": 1 },
-    encrypted: true,
-  },
-  {
-    id: 102,
-    from: "Bob",
-    to: "Alice",
-    content: "Sure, I'll handle the backend integration.",
-    timestamp: "2025-04-20T10:32:00Z",
-    reactions: { "👍": 1 },
-    encrypted: true,
-  },
-  {
-    id: 103,
-    from: "Alice",
-    to: "Bob",
-    content: "Great! Let's sync up later today.",
-    timestamp: "2025-04-20T10:35:00Z",
-    reactions: {},
-    encrypted: true,
-  },
-];
 
 const HomePage: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
@@ -97,7 +35,6 @@ const HomePage: React.FC = () => {
   const { token, userDTO } = useSelector((state: RootState) => state.auth);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
-  const [file, setFile] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -115,7 +52,6 @@ const HomePage: React.FC = () => {
         setCurrentMessages(res);
         // console.log("teh current messages are", res);
       }
-      //!handle the case when no messages are found(empty state)
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -124,25 +60,20 @@ const HomePage: React.FC = () => {
   //fetch message on selected chat
   useEffect(() => {
     if (allChats && selectedChatId) {
-      const chat = allChats.find((c) => c.id === selectedChatId); //!idhar
+      const chat = allChats.find((c) => c.id === selectedChatId); 
       if (chat) {
 
         setSelectedChat(chat);
         fetchMessages(chat.email);
       }
-      //api call to get messages
-      //   const currentMessages = selectedChatId ? dummyMessages : [];
-      console.log("Selected chat:", selectedChat, "selectedChatId:", selectedChatId, "chat",chat );
     }
-    // console.log("Selected chat:", selectedChat); slect chat is null, chat ko dekh
     
     
   }, [selectedChatId]);
 
   const getAllChats = async () => {
     const res: Chat[] = await fetchAllChats(token);
-    // console.log("All chats:", res);
-    
+
     if (res && res.length > 0) {
       setAllChats(res);
     }

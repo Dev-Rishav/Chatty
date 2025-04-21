@@ -32,7 +32,7 @@ const Auth: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/Main');
+      navigate('/home');
     }
   }, [isAuthenticated, navigate]);
 
