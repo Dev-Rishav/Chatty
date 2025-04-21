@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MagnifyingGlassIcon,
   PlusCircleIcon,
@@ -97,6 +97,7 @@ const HomePage: React.FC = () => {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [file, setFile] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   if (token === null || token === undefined) {
     window.location.href = "/login";
@@ -225,6 +226,12 @@ const HomePage: React.FC = () => {
     };
   }, [selectedChat]);
 
+      const scrollToBottom = () => {
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      };
+  
+      useEffect(scrollToBottom, [currentMessages]);
+
   return (
     <div
       className="min-h-screen bg-[#f5f1e8]"
@@ -338,10 +345,12 @@ const HomePage: React.FC = () => {
               <div
                 className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#faf8f3] bg-cover bg-center"
                 style={{ backgroundImage: `url(${bg1})` }}
+
               >
                 {currentMessages.map((message) => (
                   <MessageBubble key={message.id} message={message} />
                 ))}
+                <div ref={messagesEndRef} />
               </div>
               <MessageInput
                 value={messageInput}
