@@ -20,11 +20,14 @@ public class ChatDTO {
     private String email;
     private String username;
     private String lastMessage;
+    private String fileUrl;
     private LocalDateTime timestamp;
 
     //nullable
     private Integer unread;
     private Boolean isGroup;
     private String profilePic;
+
+
 
 }

@@ -23,6 +23,7 @@ import { RootState } from "../../redux/store";
 import fetchAllMessages from "../../utility/fetchAllMessages";
 import stompService from "../../services/stompService";
 import toast from "react-hot-toast";
+import uploadFile from "../../utility/uploadFile";
 
 // const dummyChats: Chat[] = [
 //   {
@@ -98,6 +99,8 @@ const HomePage: React.FC = () => {
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [file, setFile] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
 
   if (token === null || token === undefined) {
     window.location.href = "/login";
@@ -150,24 +153,45 @@ const HomePage: React.FC = () => {
 
   //send message function
   const handleSendMessage = async () => {
-    if (messageInput.trim() && selectedChat && userDTO) {
-      // const res=await handleSendMessage()
-      stompService.send("/app/private-message", {
-        content: messageInput,
-        to: selectedChat?.email,
-      });
-      setFile(null);
+    if ((!messageInput.trim() && !selectedFile) || !selectedChat || !userDTO) return;
+  
+    const pushMessageToUI = (fileUrl: string | null = null) => {
       const messageToSend: Message = {
-        id: Date.now(), // Temporary ID until the backend sends a real one
+        id: Date.now(),
         content: messageInput,
         from: userDTO.email,
         to: selectedChat.email,
         timestamp: new Date().toISOString(),
+        fileUrl: fileUrl || undefined,
       };
-      setCurrentMessages((prevMessages) => [...prevMessages, messageToSend]);
+  
+      setCurrentMessages((prev) => [...prev, messageToSend]);
+      setMessageInput("");
+      setSelectedFile(null);
+    };
+  
+    const payload: any = {
+      to: selectedChat.email,
+      from: userDTO.email,
+      content: messageInput || "", // fallback to empty string if file only
+    };
+  
+    if (selectedFile) {
+      try {
+        const data = await uploadFile(selectedFile, token);
+        payload.fileUrl = data.url;
+        stompService.send("/app/private-message", payload);
+        pushMessageToUI(data.url);
+      } catch (error) {
+        console.error("File upload failed:", error);
+      }
+    } else {
+      stompService.send("/app/private-message", payload);
+      pushMessageToUI();
     }
-    setMessageInput("");
   };
+  
+
 
   //event listeners for new messages
   useEffect(() => {
@@ -226,11 +250,21 @@ const HomePage: React.FC = () => {
     };
   }, [selectedChat]);
 
-      const scrollToBottom = () => {
+  const scrollToBottom = () => {
           messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       };
   
-      useEffect(scrollToBottom, [currentMessages]);
+  useEffect(scrollToBottom, [currentMessages]);
+
+
+  //handle file upload
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+  };  
+  
+
+
+
 
   return (
     <div
@@ -356,6 +390,7 @@ const HomePage: React.FC = () => {
                 value={messageInput}
                 onChange={setMessageInput}
                 onSend={handleSendMessage}
+                onFileSelect={handleFileSelect}
               />
             </div>
           ) : (
