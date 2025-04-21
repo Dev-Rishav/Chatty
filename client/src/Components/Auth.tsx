@@ -1,5 +1,4 @@
 import React, { useEffect, useState, FormEvent } from 'react';
-import SignIn from "../assets/SignIn.png";
 import { PiEye, PiEyeSlash } from "react-icons/pi";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { loginUser, registerUser } from "../redux/actions/authActions";
 import { AppDispatch, RootState } from '../redux/store';
+import bg2 from "../assets/bg2.webp";
+import Letter from "../assets/letter.png";
 
 interface User {
   email: string;
@@ -67,17 +68,30 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <section className="bg-cyan-100 min-h-screen flex items-center justify-center">
-        <div className="bg-gray-50 flex rounded-2xl shadow-lg max-w-3xl p-5 items-center">
-          <div className="md:w-1/2 px-16">
-            <h2 className="font-bold text-2xl text-[#002D74] text-center">
-              {isResetPassword ? 'Reset Password' : isSignUp ? 'Sign Up' : 'Login'}
+    <div
+      
+    >
+    
+       {/* <Navbar /> */}
+      <section className="min-h-screen flex items-center justify-center bg-[#f5f1e8] p-4 "
+      style={{ backgroundImage: `url(${bg2})` , backgroundSize: 'auto' }}
+      >
+        <div className="paper-container flex rounded-sm shadow-paper-deep max-w-3xl p-8 items-center">
+
+        <div className="md:block hidden w-1/2 pl-8">
+            <img 
+              className="rounded-sm shadow-paper-deep" 
+              src={Letter} 
+              alt="Vintage Correspondence" 
+            />
+          </div>
+          <div className="md:w-1/2 px-8">
+            <h2 className="font-fairplay text-3xl text-amber-900 text-center mb-6">
+              {isResetPassword ? 'Reset Password' : isSignUp ? 'Sign Up' : 'Welcome Back'}
             </h2>
 
             {error && (
-              <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+              <div className="mt-4 p-3 bg-red-100/80 border border-red-800/30 text-red-800 rounded-sm">
                 {error}
               </div>
             )}
@@ -85,40 +99,40 @@ const Auth: React.FC = () => {
             {isResetPassword ? (
               <form onSubmit={handlePasswordReset} className="flex flex-col gap-4">
                 <input
-                  className="p-2 mt-8 rounded-xl border"
+                  className="paper-input mt-4"
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder="Your Email"
                   value={user.email}
                   onChange={(e) => setUser({ ...user, email: e.target.value })}
                 />
                 <button
                   type="submit"
-                  className="bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300"
+                  className="paper-button-primary"
                 >
-                  Send Reset Email
+                  Send Reset Instructions
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsResetPassword(false)}
-                  className="text-[#002D74] text-sm"
+                  className="text-amber-700/90 text-sm hover:underline"
                 >
-                  Back to Login
+                  ← Return to Login
                 </button>
               </form>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <input
-                  className="p-2 mt-8 rounded-xl border"
+                  className="paper-input mt-4"
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder="Your Email"
                   value={user.email}
                   onChange={(e) => setUser({ ...user, email: e.target.value })}
                 />
                 <div className="relative">
                   <input
-                    className="w-full p-2 rounded-xl border"
+                    className="paper-input w-full"
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     placeholder="Password"
@@ -128,56 +142,62 @@ const Auth: React.FC = () => {
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-amber-700/80"
                   >
                     {showPassword ? <PiEyeSlash /> : <PiEye />}
                   </button>
                 </div>
                 <button
                   type="submit"
-                  className="bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300"
+                  className="paper-button-primary text-lg tracking-wide"
                 >
-                  {isSignUp ? 'Sign Up' : 'Login'}
+                  {isSignUp ? 'Sign Up' : 'Log In'}
                 </button>
               </form>
             )}
 
-            <div className="mt-10 grid grid-cols-3 items-center text-gray-500">
-              <hr className="border-gray-400" />
-              <p className="text-center text-sm">OR</p>
-              <hr className="border-gray-400" />
+            <div className="mt-8 grid grid-cols-3 items-center text-amber-700/80">
+              <hr className="border-amber-700/20" />
+              <p className="text-center text-sm font-crimson">Or Continue With</p>
+              <hr className="border-amber-700/20" />
             </div>
 
-            <button className="bg-white border w-full rounded-xl mt-5 py-2 flex justify-center items-center text-sm hover:scale-105 duration-300">
-              <FcGoogle className="w-5 h-5 mr-2" />
-              {isSignUp ? 'Sign up' : 'Login'} with Google
+            <button className="paper-button-secondary w-full mt-4 py-2 flex justify-center items-center text-sm hover:scale-105 duration-300">
+              <FcGoogle className="w-5 h-5 mr-2 " />
+              {isSignUp ? 'Enroll via Google' : 'Enter via Google'}
             </button>
 
             {!isSignUp && !isResetPassword && (
               <div
-                className="mt-2 text-xs border-b py-4 border-gray-400 cursor-pointer text-center"
+                className="mt-4 text-sm text-amber-700/80 text-center hover:underline cursor-pointer "
                 onClick={() => setIsResetPassword(true)}
               >
-                Forgot your password?
+                Forgotten your password?
               </div>
             )}
 
-            <div className="mt-3 text-xs flex justify-between items-center">
-              <p>{isSignUp ? 'Already have an account?' : "Don't have an account?"}</p>
+            <div className="mt-6 text-sm text-amber-700/80 flex justify-between items-center">
+              <p className=" font-crimson text-sm font-semibold">
+                {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+              </p>
               <button
-                className="py-2 px-5 bg-white border rounded-xl hover:scale-110 duration-300"
+                className="paper-button-alternative"
                 onClick={() => setIsSignUp((prev) => !prev)}
               >
                 {isSignUp ? 'Login' : 'Register'}
               </button>
             </div>
           </div>
-          <div className="md:block hidden w-1/2">
-            <img className="rounded-2xl px-2" src={SignIn} alt="Sign In" />
-          </div>
+          {/* <div className="md:block hidden w-1/2 pl-8">
+            <img 
+              className="rounded-sm shadow-paper-deep" 
+              src={Letter} 
+              alt="Vintage Correspondence" 
+            />
+          </div> */}
         </div>
       </section>
-    </>
+    </div>
   );
 };
 

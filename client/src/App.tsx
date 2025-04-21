@@ -12,6 +12,8 @@ import PrivateRoute from './redux/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
 import Test from './Components/Test';
 import Test2 from './Components/Test2';
+import HomePage from './pages/HomePage';
+import Home from './Components/NewUI/Home';
 
 const App: React.FC = () => {
   return (
@@ -27,6 +29,7 @@ const App: React.FC = () => {
           {/* Private Route */}
           <Route element={<PrivateRoute />}>
             <Route path="/Main" element={<Main />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/ChatLayout" element={<ChatLayout />} />
           </Route>
         </Routes>

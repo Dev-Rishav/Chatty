@@ -21,5 +21,15 @@ public interface MessageRepo extends JpaRepository<Message, Long> {
 
     List<Message> findByChat_ChatId(int chatId);
 
-    List<Message> findByChat_(Chat chat);
+
+
+    @Query("""
+    SELECT m FROM Message m
+    WHERE m.timestamp IN (
+        SELECT MAX(m2.timestamp) FROM Message m2
+        WHERE m2.chat.chatId IN :chatIds
+        GROUP BY m2.chat.chatId
+    )
+    """)
+    List<Message> findLatestMessagesForChats(@Param("chatIds") List<Integer> chatIds);
 }
