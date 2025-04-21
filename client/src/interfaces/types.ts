@@ -12,4 +12,18 @@ export interface Message {
   content: string;
   timestamp: any; 
   fileUrl?: string;
+  reactions?: Record<string, number>;
+  encrypted?: boolean;
+}
+
+export interface Chat {
+  id: number;
+  email:string
+  username: string;
+  lastMessage: string;
+  timestamp: string;
+  unread?: number;
+  isGroup?: boolean;
+  online?: boolean;
+  profilePic?: string;
 }

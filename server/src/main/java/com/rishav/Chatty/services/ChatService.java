@@ -1,7 +1,9 @@
 package com.rishav.Chatty.services;
 
 
+import com.rishav.Chatty.dto.ChatDTO;
 import com.rishav.Chatty.dto.ChatMessageDTO;
+import com.rishav.Chatty.dto.UserDTO;
 import com.rishav.Chatty.entities.Chat;
 import com.rishav.Chatty.entities.Message;
 import com.rishav.Chatty.entities.Users;
@@ -14,7 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class ChatService {
@@ -28,6 +34,8 @@ public class ChatService {
     private UsersRepo usersRepo;
     @Autowired
     private ChatRepo chatRepo;
+    @Autowired
+    private MessageRepo messageRepo;
 
     @Transactional
     public void sendPrivateMessage(ChatMessageDTO message, String senderEmail) {
@@ -85,5 +93,54 @@ public class ChatService {
         );
 
         System.out.println("Message saved and sent: " + msg);
+    }
+
+    public List<ChatDTO> getAllChats(Principal principal) {
+        String currentUserEmail = principal.getName();
+
+        // Step 1: Find all chat IDs involving current user
+        List<Integer> chatIds = chatRepo.findChatIdsByUserEmail(currentUserEmail);
+        if (chatIds.isEmpty()) return Collections.emptyList();
+
+        // Step 2: Fetch latest message for each chat ID in a single query
+        List<Message> latestMessages = messageRepo.findLatestMessagesForChats(chatIds);
+
+        // Step 3: Build DTOs from messages
+        List<ChatDTO> chatList = new ArrayList<>();
+        for (Message message : latestMessages) {
+            Chat chat = message.getChat();
+
+            // Determine the other user in the chat
+            String otherUserId = chat.getUser1Id().equals(currentUserEmail)
+                    ? chat.getUser2Id()
+                    : chat.getUser1Id();
+
+            Users otherUser=usersRepo.findByEmail(otherUserId);
+
+            ChatDTO dto = new ChatDTO();
+
+            dto.setChatId(chat.getChatId());
+            dto.setEmail(otherUser.getEmail());
+            dto.setUsername(otherUser.getUsername());
+            dto.setProfilePic(otherUser.getProfilePic());
+            dto.setLastMessage(message.getContent());
+            dto.setTimestamp(message.getTimestamp());
+
+
+//
+//            dto.setChatId(chat.getId());
+//            dto.setEmail(otherUser.getEmail());
+//            dto.setUsername(otherUser.getUsername());
+//            dto.setProfilePic(otherUser.getProfilePic());
+//            dto.setLastMessage(message);
+
+            // Optional: set unread count if applicable
+            // dto.setUnread(...);
+
+            chatList.add(dto);
+        }
+
+        return chatList;
+
     }
 }
