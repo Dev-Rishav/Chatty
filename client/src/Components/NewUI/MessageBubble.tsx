@@ -7,16 +7,48 @@ const MessageBubble = ({ message }: { message: Message }) =>{
     const { userDTO } = useSelector((state: RootState) => state.auth);
     if(userDTO === null) return null;
 
-    //for now bind encryption to user
-    message.encrypted = true;
+  // Temporary: mark all messages as encrypted
+  message.encrypted = true;
+
+  const isImage = (url: string) => {
+    return /\.(jpeg|jpg|gif|png|webp)$/i.test(url);
+  };
     
-    return(
+  return (
     <div className={`flex ${message.from === userDTO.email ? 'justify-end' : 'justify-start'}`}>
-      <div className="paper-message max-w-md p-4 relative">
+      <div className="paper-message max-w-md p-4 relative bg-amber-50  border border-amber-100">
         <div className="absolute top-2 right-2 w-4 h-4 bg-amber-100/50 rounded-full" />
-        <p className="text-amber-900 font-crimson font-medium text-lg">
-          {message.content}
-        </p>
+
+        {/* TEXT */}
+        {message.content && (
+          <p className="text-amber-900 font-crimson font-medium text-lg break-words whitespace-pre-wrap">
+            {message.content}
+          </p>
+        )}
+
+        {/* FILE PREVIEW */}
+        {message.fileUrl && (
+          <div className="mt-3">
+            {isImage(message.fileUrl) ? (
+              <img
+                src={message.fileUrl}
+                alt="sent file"
+                className="max-h-60 rounded-lg border border-amber-200"
+              />
+            ) : (
+              <a
+                href={message.fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-sm text-blue-700 hover:underline bg-amber-100 px-3 py-2 rounded shadow"
+              >
+                📄 View File
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* FOOTER */}
         <div className="mt-3 flex items-center space-x-2">
           <span className="text-sm italic font-crimson text-amber-700/80">
             {new Date(message.timestamp).toLocaleTimeString()}

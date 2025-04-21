@@ -67,7 +67,8 @@ public class MessageService {
                 message.getSender().getEmail(),
                 message.getReceiver().getEmail(),
                 message.getContent(),
-                message.getTimestamp()
+                message.getTimestamp(),
+                message.getFile_url()
         );
     }
 

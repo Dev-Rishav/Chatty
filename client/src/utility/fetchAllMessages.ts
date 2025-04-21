@@ -16,8 +16,10 @@ const fetchAllMessages = async ( token:string ,user: string) => {
         Authorization: `Bearer ${token}`, // Include the token in the Authorization header
       },
     });
-
+    console.log("messages",response.data);
     return response.data; // Return the fetched messages
+
+    
   } catch (error) {
     console.error("Error fetching messages:", error);
     throw error; // Re-throw the error for the caller to handle

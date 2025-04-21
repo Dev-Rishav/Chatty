@@ -22,13 +22,13 @@ const App: React.FC = () => {
         <Toaster />
         <AuthStatus />
         <Routes>
-          <Route path="/Test" element={<Test />} />
-          <Route path="/Test2" element={<Test2 />} />
-          <Route path="/auth" element={<Auth />} />
+          {/* <Route path="/Test" element={<Test />} /> */}
+          {/* <Route path="/Test2" element={<Test2 />} /> */}
+          {/* <Route path="/auth" element={<Auth />} /> */}
           <Route path="/" element={<Auth />} />
           {/* Private Route */}
           <Route element={<PrivateRoute />}>
-            <Route path="/Main" element={<Main />} />
+            {/* <Route path="/Main" element={<Main />} /> */}
             <Route path="/home" element={<Home />} />
             <Route path="/ChatLayout" element={<ChatLayout />} />
           </Route>

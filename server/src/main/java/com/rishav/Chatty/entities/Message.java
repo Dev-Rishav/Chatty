@@ -33,6 +33,7 @@ public class Message {
 
     private String content;
     private LocalDateTime timestamp;
+    private String file_url;
 
     @PrePersist
     protected void onCreate() {

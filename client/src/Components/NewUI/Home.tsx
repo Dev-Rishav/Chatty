@@ -23,69 +23,8 @@ import { RootState } from "../../redux/store";
 import fetchAllMessages from "../../utility/fetchAllMessages";
 import stompService from "../../services/stompService";
 import toast from "react-hot-toast";
+import uploadFile from "../../utility/uploadFile";
 
-// const dummyChats: Chat[] = [
-//   {
-//     id: 1",
-//     name: "Design Team",
-//     lastMessage: "Let's finalize the UI design.",
-//     timestamp: "2025-04-20T10:30:00Z",
-//     unread: 2,
-//     isGroup: true,
-//     online: true,
-//     avatar: "https://example.com/avatar1.png",
-//   },
-//   {
-//     id: "2",
-//     name: "John Doe",
-//     lastMessage: "See you tomorrow!",
-//     timestamp: "2025-04-20T09:15:00Z",
-//     unread: 0,
-//     isGroup: false,
-//     online: false,
-//     avatar: "https://example.com/avatar2.png",
-//   },
-//   {
-//     id: "3",
-//     name: "Marketing Team",
-//     lastMessage: "Campaign launch is scheduled.",
-//     timestamp: "2025-04-19T18:45:00Z",
-//     unread: 5,
-//     isGroup: true,
-//     online: true,
-//     avatar: "https://example.com/avatar3.png",
-//   },
-// ];
-
-const dummyMessages: Message[] = [
-  {
-    id: 1101,
-    from: "Alice",
-    to: "Bob",
-    content: "Let's create something amazing together! 🎨",
-    timestamp: "2025-04-20T10:30:00Z",
-    reactions: { "👍": 2, "❤️": 1 },
-    encrypted: true,
-  },
-  {
-    id: 102,
-    from: "Bob",
-    to: "Alice",
-    content: "Sure, I'll handle the backend integration.",
-    timestamp: "2025-04-20T10:32:00Z",
-    reactions: { "👍": 1 },
-    encrypted: true,
-  },
-  {
-    id: 103,
-    from: "Alice",
-    to: "Bob",
-    content: "Great! Let's sync up later today.",
-    timestamp: "2025-04-20T10:35:00Z",
-    reactions: {},
-    encrypted: true,
-  },
-];
 
 const HomePage: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
@@ -96,8 +35,9 @@ const HomePage: React.FC = () => {
   const { token, userDTO } = useSelector((state: RootState) => state.auth);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
-  const [file, setFile] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
 
   if (token === null || token === undefined) {
     window.location.href = "/login";
@@ -112,7 +52,6 @@ const HomePage: React.FC = () => {
         setCurrentMessages(res);
         // console.log("teh current messages are", res);
       }
-      //!handle the case when no messages are found(empty state)
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -121,25 +60,20 @@ const HomePage: React.FC = () => {
   //fetch message on selected chat
   useEffect(() => {
     if (allChats && selectedChatId) {
-      const chat = allChats.find((c) => c.id === selectedChatId); //!idhar
+      const chat = allChats.find((c) => c.id === selectedChatId); 
       if (chat) {
 
         setSelectedChat(chat);
         fetchMessages(chat.email);
       }
-      //api call to get messages
-      //   const currentMessages = selectedChatId ? dummyMessages : [];
-      console.log("Selected chat:", selectedChat, "selectedChatId:", selectedChatId, "chat",chat );
     }
-    // console.log("Selected chat:", selectedChat); slect chat is null, chat ko dekh
     
     
   }, [selectedChatId]);
 
   const getAllChats = async () => {
     const res: Chat[] = await fetchAllChats(token);
-    // console.log("All chats:", res);
-    
+
     if (res && res.length > 0) {
       setAllChats(res);
     }
@@ -150,24 +84,45 @@ const HomePage: React.FC = () => {
 
   //send message function
   const handleSendMessage = async () => {
-    if (messageInput.trim() && selectedChat && userDTO) {
-      // const res=await handleSendMessage()
-      stompService.send("/app/private-message", {
-        content: messageInput,
-        to: selectedChat?.email,
-      });
-      setFile(null);
+    if ((!messageInput.trim() && !selectedFile) || !selectedChat || !userDTO) return;
+  
+    const pushMessageToUI = (fileUrl: string | null = null) => {
       const messageToSend: Message = {
-        id: Date.now(), // Temporary ID until the backend sends a real one
+        id: Date.now(),
         content: messageInput,
         from: userDTO.email,
         to: selectedChat.email,
         timestamp: new Date().toISOString(),
+        fileUrl: fileUrl || undefined,
       };
-      setCurrentMessages((prevMessages) => [...prevMessages, messageToSend]);
+  
+      setCurrentMessages((prev) => [...prev, messageToSend]);
+      setMessageInput("");
+      setSelectedFile(null);
+    };
+  
+    const payload: any = {
+      to: selectedChat.email,
+      from: userDTO.email,
+      content: messageInput || "", // fallback to empty string if file only
+    };
+  
+    if (selectedFile) {
+      try {
+        const data = await uploadFile(selectedFile, token);
+        payload.fileUrl = data.url;
+        stompService.send("/app/private-message", payload);
+        pushMessageToUI(data.url);
+      } catch (error) {
+        console.error("File upload failed:", error);
+      }
+    } else {
+      stompService.send("/app/private-message", payload);
+      pushMessageToUI();
     }
-    setMessageInput("");
   };
+  
+
 
   //event listeners for new messages
   useEffect(() => {
@@ -226,11 +181,21 @@ const HomePage: React.FC = () => {
     };
   }, [selectedChat]);
 
-      const scrollToBottom = () => {
+  const scrollToBottom = () => {
           messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       };
   
-      useEffect(scrollToBottom, [currentMessages]);
+  useEffect(scrollToBottom, [currentMessages]);
+
+
+  //handle file upload
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+  };  
+  
+
+
+
 
   return (
     <div
@@ -356,6 +321,7 @@ const HomePage: React.FC = () => {
                 value={messageInput}
                 onChange={setMessageInput}
                 onSend={handleSendMessage}
+                onFileSelect={handleFileSelect}
               />
             </div>
           ) : (

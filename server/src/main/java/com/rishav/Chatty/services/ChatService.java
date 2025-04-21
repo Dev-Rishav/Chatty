@@ -1,6 +1,8 @@
 package com.rishav.Chatty.services;
 
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.rishav.Chatty.dto.ChatDTO;
 import com.rishav.Chatty.dto.ChatMessageDTO;
 import com.rishav.Chatty.entities.Chat;
@@ -15,11 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ChatService {
@@ -41,8 +42,6 @@ public class ChatService {
 
         // Get  receiver from the DTO
         String receiverEmail = message.getTo();
-
-
 
         // Consistent ordering to prevent duplicate chats
         String user1Id = senderEmail;
@@ -70,21 +69,25 @@ public class ChatService {
         }
 
 
+
+
         // Save the message to the database
         Message msg = new Message();
         msg.setSender(sender);
         msg.setReceiver(receiver);
         msg.setContent(message.getContent());
         msg.setChat(chat);
+        msg.setFile_url(message.getFileUrl());
         msg=messageRepository.save(msg);
 
-        // Create a response DTO to send back to the client
+        // Populate response DTO
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO();
         chatMessageDTO.setId(msg.getId());
         chatMessageDTO.setTo(receiverEmail);
         chatMessageDTO.setFrom(senderEmail);  // sender is the email from the principal
         chatMessageDTO.setContent(message.getContent());
         chatMessageDTO.setTimestamp(msg.getTimestamp());
+        chatMessageDTO.setFileUrl(msg.getFile_url());
 
         // Send the message to the recipient via WebSocket
         messagingTemplate.convertAndSendToUser(
@@ -126,17 +129,7 @@ public class ChatService {
             dto.setProfilePic(otherUser.getProfilePic());
             dto.setLastMessage(message.getContent());
             dto.setTimestamp(message.getTimestamp());
-
-
-//
-//            dto.setChatId(chat.getId());
-//            dto.setEmail(otherUser.getEmail());
-//            dto.setUsername(otherUser.getUsername());
-//            dto.setProfilePic(otherUser.getProfilePic());
-//            dto.setLastMessage(message);
-
-            // Optional: set unread count if applicable
-            // dto.setUnread(...);
+            dto.setFileUrl(message.getFile_url());
 
             chatList.add(dto);
         }
