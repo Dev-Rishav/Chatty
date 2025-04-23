@@ -35,6 +35,7 @@ class StompService {
     });
   }
 
+
   subscribe(destination: string, callback: (message: any) => void) {
     if (this.subscriptions[destination]) {
       console.warn(`Already subscribed to ${destination}`);

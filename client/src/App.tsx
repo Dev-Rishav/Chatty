@@ -2,12 +2,12 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Main from './Components/Main';
 import ChatLayout from './Components/ChatLayout';
-// import Landing from './Components/Landing'
-// import Login from './Components/Login'
 import Auth from './Components/Auth';
 import { Provider } from 'react-redux';
-import AuthStatus from './redux/AuthStatus';
+import { PersistGate } from 'redux-persist/integration/react';
+import {  persistor } from './redux/store';
 import store from './redux/store';
+import AuthStatus from './redux/AuthStatus';
 import PrivateRoute from './redux/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
 import Test from './Components/Test';
@@ -18,24 +18,23 @@ import Home from './Components/NewUI/Home';
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <Router>
-        <Toaster />
-        <AuthStatus />
-        <Routes>
-          {/* <Route path="/Test" element={<Test />} /> */}
-          {/* <Route path="/Test2" element={<Test2 />} /> */}
-          {/* <Route path="/auth" element={<Auth />} /> */}
-          <Route path="/" element={<Auth />} />
-          {/* Private Route */}
-          <Route element={<PrivateRoute />}>
-            {/* <Route path="/Main" element={<Main />} /> */}
-            <Route path="/home" element={<Home />} />
-            <Route path="/ChatLayout" element={<ChatLayout />} />
-          </Route>
-        </Routes>
-      </Router>
+      <PersistGate loading={null} persistor={persistor}>
+        <Router>
+          <Toaster />
+          <AuthStatus />
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<Auth />} />
+            {/* Private Route */}
+            <Route element={<PrivateRoute />}>
+              <Route path="/home" element={<Home />} />
+              <Route path="/ChatLayout" element={<ChatLayout />} />
+            </Route>
+          </Routes>
+        </Router>
+      </PersistGate>
     </Provider>
   );
-}
+};
 
 export default App;

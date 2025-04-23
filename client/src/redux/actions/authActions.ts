@@ -9,7 +9,9 @@ import {
   SIGNUP_FAILURE,
   LOGOUT,
 } from './authActionTypes';
-import { AppDispatch } from '../store';
+import { AppDispatch, persistor } from '../store';
+import { setInitialOnlineUsers, updateUserPresence } from './presenceActions';
+import stompService from '../../services/stompService';
 
 interface Credentials {
   email: string;
@@ -41,6 +43,23 @@ export const loginUser = (credentials: Credentials) => async (dispatch: AppDispa
       type: LOGIN_SUCCESS,
       payload: { userDTO, token },
     });
+
+    const res = await axios.get<string[]>(
+      'http://localhost:8080/api/presence/online',
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    //  Convert Set<String> → Record<string, boolean>
+    const onlineUsersMap: Record<string, boolean> = {};
+    res.data.forEach((email: string) => {
+      onlineUsersMap[email] = true;
+    });
+
+    dispatch(setInitialOnlineUsers(onlineUsersMap)); // Store in Redux
+
+
+    
+
   } catch (error: any) {
     dispatch({
       type: LOGIN_FAILURE,
@@ -78,8 +97,11 @@ export const registerUser = (credentials: Credentials) => async (dispatch: AppDi
   }
 };
 
-export const logoutUser = () => (dispatch: AppDispatch) => {
+export const logoutUser =() => async(dispatch: AppDispatch) => {
+  await persistor.purge();
+  stompService.disconnect();
   localStorage.removeItem('authToken');
   localStorage.removeItem('userDTO');
   dispatch({ type: LOGOUT });
+  toast.success("You have been logged out.");
 };
