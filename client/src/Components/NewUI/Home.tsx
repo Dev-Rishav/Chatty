@@ -126,33 +126,35 @@ const HomePage: React.FC = () => {
 
   //event listeners for new messages
   useEffect(() => {
-    if (!stompService.isConnected()) {
-      stompService.connect(token, () => {
-        stompService.subscribe("/user/queue/messages", (payload: any) => {
-          console.log("Message received:", payload);
-          console.log("payload from:", payload.from," selectedChat email:", selectedChat?.email);
+    //! dont connect again if already connected 
+    // if (!stompService.isConnected()) {
+    //   stompService.connect(token,
+    //      () => {
+    //     stompService.subscribe("/user/queue/messages", (payload: any) => {
+    //       console.log("Message received:", payload);
+    //       console.log("payload from:", payload.from," selectedChat email:", selectedChat?.email);
           
-          if (payload.from === selectedChat?.email) {
-            console.log("adadadadacacadad");
+    //       if (payload.from === selectedChat?.email) {
+    //         console.log("adadadadacacadad");
             
-            setCurrentMessages((prevMessages) => {
-              const message: Message = {
-                id: Date.now(), // Temporary ID until the backend sends a real one
-                content: payload.content,
-                from: payload.from,
-                to: payload.to,
-                timestamp: payload.timestamp,
-                fileUrl: payload.fileUrl ? payload.fileUrl : null,
-                reactions: payload.reactions ? payload.reactions : {},
-                encrypted: payload.encrypted ? payload.encrypted : false,
-              };
-              console.log("Message received and bindec:", message);
-              return [...(prevMessages || []), message];
-            });
-          }
-        });
-      });
-    } else {
+    //         setCurrentMessages((prevMessages) => {
+    //           const message: Message = {
+    //             id: Date.now(), // Temporary ID until the backend sends a real one
+    //             content: payload.content,
+    //             from: payload.from,
+    //             to: payload.to,
+    //             timestamp: payload.timestamp,
+    //             fileUrl: payload.fileUrl ? payload.fileUrl : null,
+    //             reactions: payload.reactions ? payload.reactions : {},
+    //             encrypted: payload.encrypted ? payload.encrypted : false,
+    //           };
+    //           console.log("Message received and bindec:", message);
+    //           return [...(prevMessages || []), message];
+    //         });
+    //       }
+    //     });
+    //   });
+    // } else {
       stompService.subscribe("/user/queue/messages", (payload: any) => {
         if (payload.from === selectedChat?.email) {
           //bind it with the current message only if the sender is the current receiver
@@ -174,12 +176,15 @@ const HomePage: React.FC = () => {
         // const message = JSON.parse(payload.body);
         toast.success("💬 Got message:", payload.content);
       });
-    }
+    // }
 
     return () => {
       stompService.unsubscribe("/user/queue/messages");
     };
   }, [selectedChat]);
+
+
+
 
   const scrollToBottom = () => {
           messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -193,7 +198,10 @@ const HomePage: React.FC = () => {
     setSelectedFile(file);
   };  
   
-
+  const onlineUsers = useSelector((state: RootState) => state.presence.onlineUsers);
+  const onlineUsersArray = Object.keys(onlineUsers).filter((email) => onlineUsers[email]);
+  console.log("online users",onlineUsersArray);
+  
 
 
 

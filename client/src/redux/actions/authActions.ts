@@ -10,6 +10,8 @@ import {
   LOGOUT,
 } from './authActionTypes';
 import { AppDispatch } from '../store';
+import { setInitialOnlineUsers, updateUserPresence } from './presenceActions';
+import stompService from '../../services/stompService';
 
 interface Credentials {
   email: string;
@@ -41,6 +43,29 @@ export const loginUser = (credentials: Credentials) => async (dispatch: AppDispa
       type: LOGIN_SUCCESS,
       payload: { userDTO, token },
     });
+
+    const res = await axios.get<string[]>(
+      'http://localhost:8080/api/presence/online',
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    //  Convert Set<String> → Record<string, boolean>
+    const onlineUsersMap: Record<string, boolean> = {};
+    res.data.forEach((email: string) => {
+      onlineUsersMap[email] = true;
+    });
+
+    dispatch(setInitialOnlineUsers(onlineUsersMap)); // Store in Redux
+
+
+    stompService.connect(token, () => {
+      //subscribe to the presence updates (to get updates on online users)
+      stompService.subscribe("/topic/presence", (message) => {
+        const { email, online } = message;
+        dispatch(updateUserPresence(email, online)); // Dispatch presence updates to Redux
+      });
+    })
+
   } catch (error: any) {
     dispatch({
       type: LOGIN_FAILURE,
@@ -79,7 +104,9 @@ export const registerUser = (credentials: Credentials) => async (dispatch: AppDi
 };
 
 export const logoutUser = () => (dispatch: AppDispatch) => {
+  stompService.disconnect();
   localStorage.removeItem('authToken');
   localStorage.removeItem('userDTO');
   dispatch({ type: LOGOUT });
+  toast.success("You have been logged out.");
 };
