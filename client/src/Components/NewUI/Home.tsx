@@ -24,25 +24,53 @@ import fetchAllMessages from "../../utility/fetchAllMessages";
 import stompService from "../../services/stompService";
 import toast from "react-hot-toast";
 import uploadFile from "../../utility/uploadFile";
-
+import { useAppDispatch } from "../../redux/hooks";
+import { updateUserPresence } from "../../redux/actions/presenceActions";
 
 const HomePage: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showSendMoney, setShowSendMoney] = useState(false);
-  const [allChats, setAllChats] = useState<Chat[]>(); 
+  const [allChats, setAllChats] = useState<Chat[]>();
   const { token, userDTO } = useSelector((state: RootState) => state.auth);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
+  const onlineUsers = useSelector(
+    (state: RootState) => state.presence.onlineUsers
+  );
+  const onlineUsersArray = Object.keys(onlineUsers).filter(
+    (email) => onlineUsers[email]
+  );
+  const dispatch = useAppDispatch();
 
   if (token === null || token === undefined) {
     window.location.href = "/login";
     return null;
   }
+
+
+  useEffect(() => {
+    const connectStomp = () => {
+      try {
+        stompService.connect(token, () => {
+          //subscribe to the presence updates (to get updates on online users)
+          stompService.subscribe("/topic/presence", (message) => {
+            const { email, online } = message;
+            dispatch(updateUserPresence(email, online)); // Dispatch presence updates to Redux
+          });
+        })
+      } catch (error) {
+        console.error("Error connecting to STOMP:", error);
+        throw error;
+        
+      }
+    }
+
+    connectStomp();
+  }, [token]);
 
   //function to fetch messages between current and selected chat user
   const fetchMessages = async (user: string) => {
@@ -60,15 +88,12 @@ const HomePage: React.FC = () => {
   //fetch message on selected chat
   useEffect(() => {
     if (allChats && selectedChatId) {
-      const chat = allChats.find((c) => c.id === selectedChatId); 
+      const chat = allChats.find((c) => c.id === selectedChatId);
       if (chat) {
-
         setSelectedChat(chat);
         fetchMessages(chat.email);
       }
     }
-    
-    
   }, [selectedChatId]);
 
   const getAllChats = async () => {
@@ -84,8 +109,9 @@ const HomePage: React.FC = () => {
 
   //send message function
   const handleSendMessage = async () => {
-    if ((!messageInput.trim() && !selectedFile) || !selectedChat || !userDTO) return;
-  
+    if ((!messageInput.trim() && !selectedFile) || !selectedChat || !userDTO)
+      return;
+
     const pushMessageToUI = (fileUrl: string | null = null) => {
       const messageToSend: Message = {
         id: Date.now(),
@@ -95,18 +121,18 @@ const HomePage: React.FC = () => {
         timestamp: new Date().toISOString(),
         fileUrl: fileUrl || undefined,
       };
-  
+
       setCurrentMessages((prev) => [...prev, messageToSend]);
       setMessageInput("");
       setSelectedFile(null);
     };
-  
+
     const payload: any = {
       to: selectedChat.email,
       from: userDTO.email,
       content: messageInput || "", // fallback to empty string if file only
     };
-  
+
     if (selectedFile) {
       try {
         const data = await uploadFile(selectedFile, token);
@@ -121,61 +147,32 @@ const HomePage: React.FC = () => {
       pushMessageToUI();
     }
   };
-  
-
 
   //event listeners for new messages
   useEffect(() => {
-    //! dont connect again if already connected 
-    // if (!stompService.isConnected()) {
-    //   stompService.connect(token,
-    //      () => {
-    //     stompService.subscribe("/user/queue/messages", (payload: any) => {
-    //       console.log("Message received:", payload);
-    //       console.log("payload from:", payload.from," selectedChat email:", selectedChat?.email);
-          
-    //       if (payload.from === selectedChat?.email) {
-    //         console.log("adadadadacacadad");
-            
-    //         setCurrentMessages((prevMessages) => {
-    //           const message: Message = {
-    //             id: Date.now(), // Temporary ID until the backend sends a real one
-    //             content: payload.content,
-    //             from: payload.from,
-    //             to: payload.to,
-    //             timestamp: payload.timestamp,
-    //             fileUrl: payload.fileUrl ? payload.fileUrl : null,
-    //             reactions: payload.reactions ? payload.reactions : {},
-    //             encrypted: payload.encrypted ? payload.encrypted : false,
-    //           };
-    //           console.log("Message received and bindec:", message);
-    //           return [...(prevMessages || []), message];
-    //         });
-    //       }
-    //     });
-    //   });
-    // } else {
-      stompService.subscribe("/user/queue/messages", (payload: any) => {
-        if (payload.from === selectedChat?.email) {
-          //bind it with the current message only if the sender is the current receiver
-          setCurrentMessages((prevMessages) => {
-            const message: Message = {
-              id: Date.now(), // Temporary ID until the backend sends a real one
-              content: payload.content,
-              from: payload.from,
-              to: payload.to,
-              timestamp: new Date().toISOString(),
-              fileUrl: payload.fileUrl ? payload.fileUrl : null,
-              reactions: payload.reactions ? payload.reactions : {},
-              encrypted: payload.encrypted ? payload.encrypted : false,
-            };
-            console.log("Message received:", message);
-            return [...(prevMessages || []), message];
-          });
-        }
-        // const message = JSON.parse(payload.body);
-        toast.success("💬 Got message:", payload.content);
-      });
+    if(!stompService.isConnected()) 
+      return;
+    stompService.subscribe("/user/queue/messages", (payload: any) => {
+      if (payload.from === selectedChat?.email) {
+        //bind it with the current message only if the sender is the current receiver
+        setCurrentMessages((prevMessages) => {
+          const message: Message = {
+            id: Date.now(), // Temporary ID until the backend sends a real one
+            content: payload.content,
+            from: payload.from,
+            to: payload.to,
+            timestamp: new Date().toISOString(),
+            fileUrl: payload.fileUrl ? payload.fileUrl : null,
+            reactions: payload.reactions ? payload.reactions : {},
+            encrypted: payload.encrypted ? payload.encrypted : false,
+          };
+          console.log("Message received:", message);
+          return [...(prevMessages || []), message];
+        });
+      }
+      // const message = JSON.parse(payload.body);
+      toast.success("💬 Got message:", payload.content);
+    });
     // }
 
     return () => {
@@ -183,26 +180,20 @@ const HomePage: React.FC = () => {
     };
   }, [selectedChat]);
 
-
-
-
   const scrollToBottom = () => {
-          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      };
-  
-  useEffect(scrollToBottom, [currentMessages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
+  useEffect(scrollToBottom, [currentMessages]);
 
   //handle file upload
   const handleFileSelect = (file: File) => {
     setSelectedFile(file);
-  };  
-  
-  const onlineUsers = useSelector((state: RootState) => state.presence.onlineUsers);
-  const onlineUsersArray = Object.keys(onlineUsers).filter((email) => onlineUsers[email]);
-  console.log("online users",onlineUsersArray);
-  
+  };
 
+
+
+console.log("online users", onlineUsersArray);
 
 
   return (
@@ -254,19 +245,24 @@ const HomePage: React.FC = () => {
                     className={`paper-card hover:bg-amber-50 transition-all cursor-pointer p-4 ${
                       selectedChatId === chat.id ? "bg-amber-100" : ""
                     }`}
-                    onClick={() => setSelectedChatId(chat.id)
-                    }
-                  
+                    onClick={() => setSelectedChatId(chat.id)}
                   >
-                    
                     {/* Chat item content */}
 
                     <div className="flex items-center">
                       <div className="relative">
-                        <div className="w-12 h-12 rounded-full bg-amber-100 border-2 border-amber-200 flex items-center justify-center">
-                          <span className="text-amber-700 text-xl">📬</span>
+                        <div className=" w-12 h-12 rounded-full bg-amber-100 border-2 border-amber-200 flex items-center justify-center">
+                          {chat.profilePic ? (
+                            <img
+                              src={chat.profilePic}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-amber-700 text-xl">📬</span>
+                          )}
                         </div>
-                        {chat.online && (
+                        {onlineUsersArray.includes(chat.email) && (
                           <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-600 rounded-full border-2 border-amber-100" />
                         )}
                       </div>
@@ -285,8 +281,7 @@ const HomePage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                )
-              )}
+                ))}
             </div>
 
             {/*Left Bottom */}
@@ -318,7 +313,6 @@ const HomePage: React.FC = () => {
               <div
                 className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#faf8f3] bg-cover bg-center"
                 style={{ backgroundImage: `url(${bg1})` }}
-
               >
                 {currentMessages.map((message) => (
                   <MessageBubble key={message.id} message={message} />

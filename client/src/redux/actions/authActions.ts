@@ -9,7 +9,7 @@ import {
   SIGNUP_FAILURE,
   LOGOUT,
 } from './authActionTypes';
-import { AppDispatch } from '../store';
+import { AppDispatch, persistor } from '../store';
 import { setInitialOnlineUsers, updateUserPresence } from './presenceActions';
 import stompService from '../../services/stompService';
 
@@ -58,13 +58,7 @@ export const loginUser = (credentials: Credentials) => async (dispatch: AppDispa
     dispatch(setInitialOnlineUsers(onlineUsersMap)); // Store in Redux
 
 
-    stompService.connect(token, () => {
-      //subscribe to the presence updates (to get updates on online users)
-      stompService.subscribe("/topic/presence", (message) => {
-        const { email, online } = message;
-        dispatch(updateUserPresence(email, online)); // Dispatch presence updates to Redux
-      });
-    })
+    
 
   } catch (error: any) {
     dispatch({
@@ -103,7 +97,8 @@ export const registerUser = (credentials: Credentials) => async (dispatch: AppDi
   }
 };
 
-export const logoutUser = () => (dispatch: AppDispatch) => {
+export const logoutUser =() => async(dispatch: AppDispatch) => {
+  await persistor.purge();
   stompService.disconnect();
   localStorage.removeItem('authToken');
   localStorage.removeItem('userDTO');
