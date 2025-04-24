@@ -23,20 +23,34 @@ class StompService {
   
 
   connect(token: string, onConnect?: () => void) {
-    if (this.connected) return;
+    if (this.connected ){ 
+      console.log("🔌 Already connected, skipping connect.");
+      onConnect?.();
+       return;
+    }
+
 
     const socket = new SockJS(`http://localhost:8080/ws?token=${token}`);
     this.stompClient = Stomp.over(socket);
+    this.stompClient.debug = () => {}; //disable logs
 
-    this.stompClient.connect({}, () => {
+    this.stompClient.connect({}, (frame:any) => {
       this.connected = true;
-      console.log("🔌 WebSocket connected");
+      console.log("🔌 WebSocket connected",frame);
       onConnect?.();
+    },(error:any)=>{console.error("Stomp Connection error: ",error);
     });
   }
 
 
   subscribe(destination: string, callback: (message: any) => void) {
+
+    if (!this.connected || !this.stompClient) {
+      console.warn(`⚠️ Tried subscribing to ${destination} before connection.`);
+      return;
+    }
+
+
     if (this.subscriptions[destination]) {
       console.warn(`Already subscribed to ${destination}`);
       return;
