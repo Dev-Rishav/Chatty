@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import uploadFile from "../../utility/uploadFile";
 import { useAppDispatch } from "../../redux/hooks";
 import { updateUserPresence } from "../../redux/actions/presenceActions";
+import ChatList from "./ChatList";
 
 const HomePage: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
@@ -51,7 +52,6 @@ const HomePage: React.FC = () => {
     return null;
   }
 
-
   useEffect(() => {
     const connectStomp = () => {
       try {
@@ -61,13 +61,12 @@ const HomePage: React.FC = () => {
             const { email, online } = message;
             dispatch(updateUserPresence(email, online)); // Dispatch presence updates to Redux
           });
-        })
+        });
       } catch (error) {
         console.error("Error connecting to STOMP:", error);
         throw error;
-        
       }
-    }
+    };
 
     connectStomp();
   }, [token]);
@@ -150,8 +149,7 @@ const HomePage: React.FC = () => {
 
   //event listeners for new messages
   useEffect(() => {
-    if(!stompService.isConnected()) 
-      return;
+    if (!stompService.isConnected()) return;
     stompService.subscribe("/user/queue/messages", (payload: any) => {
       if (payload.from === selectedChat?.email) {
         //bind it with the current message only if the sender is the current receiver
@@ -192,10 +190,6 @@ const HomePage: React.FC = () => {
   };
 
 
-
-console.log("online users", onlineUsersArray);
-
-
   return (
     <div
       className="min-h-screen bg-[#f5f1e8]"
@@ -227,62 +221,14 @@ console.log("online users", onlineUsersArray);
               </div>
             </div>
 
-            <div className="relative mb-6">
-              <input
-                type="text"
-                placeholder="Search conversations.."
-                className="paper-input pl-12 pr-4 py-3 font-crimson"
-              />
-              <MagnifyingGlassIcon className="absolute right-12 top-3.5 w-5 h-5 text-amber-700/80" />
-              <DocumentTextIcon className="absolute right-4 top-3.5 w-5 h-5 text-amber-700/80" />
-            </div>
 
-            <div className="flex-1 overflow-y-auto space-y-2 ">
-              {allChats &&
-                allChats.map((chat) => (
-                  <div
-                    key={chat.id}
-                    className={`paper-card hover:bg-amber-50 transition-all cursor-pointer p-4 ${
-                      selectedChatId === chat.id ? "bg-amber-100" : ""
-                    }`}
-                    onClick={() => setSelectedChatId(chat.id)}
-                  >
-                    {/* Chat item content */}
-
-                    <div className="flex items-center">
-                      <div className="relative">
-                        <div className=" w-12 h-12 rounded-full bg-amber-100 border-2 border-amber-200 flex items-center justify-center">
-                          {chat.profilePic ? (
-                            <img
-                              src={chat.profilePic}
-                              alt="Profile"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-amber-700 text-xl">📬</span>
-                          )}
-                        </div>
-                        {onlineUsersArray.includes(chat.email) && (
-                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-600 rounded-full border-2 border-amber-100" />
-                        )}
-                      </div>
-                      <div className="ml-4 flex-1">
-                        <div className="flex items-center justify-between">
-                          <p className="font-semibold text-lg font-playfair text-amber-900">
-                            {chat.username}
-                          </p>
-                          <span className="text-sm text-amber-700/80">
-                            {new Date(chat.timestamp).toLocaleTimeString()}
-                          </span>
-                        </div>
-                        <p className="text-sm text-amber-700/80 mt-1">
-                          {chat.lastMessage}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
+            {/* Left Mid */}
+            <ChatList
+              allChats={allChats}
+              selectedChatId={selectedChatId}
+              setSelectedChatId={setSelectedChatId}
+              onlineUsersArray={onlineUsersArray}
+            />
 
             {/*Left Bottom */}
             <div className="mt-4 paper-container font-crimson text-xl p-4 rounded-sm shadow-paper">
