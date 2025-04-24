@@ -19,7 +19,7 @@ public class Notification {
     private Long id;
 
     @ManyToOne
-    private Users recipient;
+    private Users receiver;
 
     private String message;
     private LocalDateTime createdAt;

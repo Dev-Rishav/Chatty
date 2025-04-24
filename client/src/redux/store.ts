@@ -13,17 +13,19 @@ import {
   REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage
+import { notificationReducer } from './reducers/notificationReducer';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   presence: presenceReducer,
+  notifications: notificationReducer,
   // Add more reducers as needed
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth', 'presence'], // persist only these reducers
+  whitelist: ['auth', 'presence','notifications'], // persist only these reducers
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

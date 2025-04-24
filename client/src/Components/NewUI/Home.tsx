@@ -19,7 +19,7 @@ import SendMoneyModal from "./SendMoneyModal";
 import { Chat, Message } from "../../interfaces/types";
 import fetchAllChats from "../../utility/fetchAllChats";
 import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import store, { RootState } from "../../redux/store";
 import fetchAllMessages from "../../utility/fetchAllMessages";
 import stompService from "../../services/stompService";
 import toast from "react-hot-toast";
@@ -28,6 +28,7 @@ import { useAppDispatch } from "../../redux/hooks";
 import { updateUserPresence } from "../../redux/actions/presenceActions";
 import ChatList from "./ChatList";
 import Navbar from "./Navbar";
+import { addNotification } from "../../redux/reducers/notificationReducer";
 
 const HomePage: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
@@ -179,6 +180,28 @@ const HomePage: React.FC = () => {
     };
   }, [selectedChat]);
 
+  //* fetch notifications
+  useEffect(() => {
+    if (!token) return;
+
+    stompService.connect(token, () => {
+      // subscribe to notifications topic
+      stompService.subscribe("/user/queue/notifications", (payload) => {
+        dispatch(
+          addNotification({
+            id: payload.id || Date.now().toString(),
+            text: payload.message || "New Notification",
+            read: payload.read || false,
+          })
+        );
+      });
+    });
+
+    return () => {
+      stompService.unsubscribe("/user/queue/notifications");
+    };
+  }, [token, dispatch]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -191,102 +214,100 @@ const HomePage: React.FC = () => {
   };
 
   console.log("curent user", userDTO);
-  
 
   return (
     <>
-    <Navbar />
-    <div
-      className="min-h-screen bg-[#f5f1e8]"
-      style={{ backgroundImage: `url(${bg2})` }}
-    >
-      <div className="flex h-screen max-w-7xl mx-auto">
-        {/* Left Sidebar */}
-        <div className="w-96 pr-4 py-6 flex flex-col">
-          <div className="paper-container p-6 rounded-sm flex-1 flex flex-col shadow-paper">
-            <div className="flex items-center justify-between mb-8 border-b border-amber-900/20 pb-4">
-              <h1 className="text-3xl tracking-wide font-playfair font-bold text-amber-900">
-                Chatty
-                <span className="text-amber-700 text-2xl ml-2">🕊️</span>
-              </h1>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setIsDarkMode(!isDarkMode)}
-                  className="paper-button p-2"
-                >
-                  {isDarkMode ? (
-                    <SunIcon className="w-6 h-6 text-amber-700" />
-                  ) : (
-                    <MoonIcon className="w-6 h-6 text-amber-700" />
-                  )}
+      <Navbar />
+      <div
+        className="min-h-screen bg-[#f5f1e8]"
+        style={{ backgroundImage: `url(${bg2})` }}
+      >
+        <div className="flex h-screen max-w-7xl mx-auto">
+          {/* Left Sidebar */}
+          <div className="w-96 pr-4 py-6 flex flex-col">
+            <div className="paper-container p-6 rounded-sm flex-1 flex flex-col shadow-paper">
+              <div className="flex items-center justify-between mb-8 border-b border-amber-900/20 pb-4">
+                <h1 className="text-3xl tracking-wide font-playfair font-bold text-amber-900">
+                  Chatty
+                  <span className="text-amber-700 text-2xl ml-2">🕊️</span>
+                </h1>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setIsDarkMode(!isDarkMode)}
+                    className="paper-button p-2"
+                  >
+                    {isDarkMode ? (
+                      <SunIcon className="w-6 h-6 text-amber-700" />
+                    ) : (
+                      <MoonIcon className="w-6 h-6 text-amber-700" />
+                    )}
+                  </button>
+                  <button className="paper-button">
+                    <PlusCircleIcon className="w-7 h-7 text-amber-700" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Left Mid */}
+              <ChatList
+                allChats={allChats}
+                selectedChatId={selectedChatId}
+                setSelectedChatId={setSelectedChatId}
+                onlineUsersArray={onlineUsersArray}
+              />
+
+              {/*Left Bottom */}
+              <div className="mt-4 paper-container font-crimson text-xl p-4 rounded-sm shadow-paper">
+                <button className="paper-menu-item">
+                  <Cog6ToothIcon className="w-6 h-6 mr-3 text-amber-700" />
+                  <span className="text-amber-900">Settings</span>
                 </button>
-                <button className="paper-button">
-                  <PlusCircleIcon className="w-7 h-7 text-amber-700" />
+                <button
+                  className="paper-menu-item"
+                  onClick={() => setShowSendMoney(true)}
+                >
+                  <CurrencyDollarIcon className="w-6 h-6 mr-3 text-green-700" />
+                  <span className="text-amber-900">Send Money</span>
+                </button>
+                <button className="paper-menu-item">
+                  <UserGroupIcon className="w-6 h-6 mr-3 text-stone-600" />
+                  <span className="text-amber-900">New Group</span>
                 </button>
               </div>
-            </div>
-
-
-            {/* Left Mid */}
-            <ChatList
-              allChats={allChats}
-              selectedChatId={selectedChatId}
-              setSelectedChatId={setSelectedChatId}
-              onlineUsersArray={onlineUsersArray}
-            />
-
-            {/*Left Bottom */}
-            <div className="mt-4 paper-container font-crimson text-xl p-4 rounded-sm shadow-paper">
-              <button className="paper-menu-item">
-                <Cog6ToothIcon className="w-6 h-6 mr-3 text-amber-700" />
-                <span className="text-amber-900">Settings</span>
-              </button>
-              <button
-                className="paper-menu-item"
-                onClick={() => setShowSendMoney(true)}
-              >
-                <CurrencyDollarIcon className="w-6 h-6 mr-3 text-green-700" />
-                <span className="text-amber-900">Send Money</span>
-              </button>
-              <button className="paper-menu-item">
-                <UserGroupIcon className="w-6 h-6 mr-3 text-stone-600" />
-                <span className="text-amber-900">New Group</span>
-              </button>
             </div>
           </div>
-        </div>
 
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col py-6 pl-4">
-          {selectedChat ? (
-            <div className="paper-container h-full flex flex-col rounded-sm shadow-paper">
-              <ChatHeader chat={selectedChat} />
-              <div
-                className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#faf8f3] bg-cover bg-center"
-                style={{ backgroundImage: `url(${bg1})` }}
-              >
-                {currentMessages.map((message) => (
-                  <MessageBubble key={message.id} message={message} />
-                ))}
-                <div ref={messagesEndRef} />
+          {/* Main Chat Area */}
+          <div className="flex-1 flex flex-col py-6 pl-4">
+            {selectedChat ? (
+              <div className="paper-container h-full flex flex-col rounded-sm shadow-paper">
+                <ChatHeader chat={selectedChat} />
+                <div
+                  className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#faf8f3] bg-cover bg-center"
+                  style={{ backgroundImage: `url(${bg1})` }}
+                >
+                  {currentMessages.map((message) => (
+                    <MessageBubble key={message.id} message={message} />
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+                <MessageInput
+                  value={messageInput}
+                  onChange={setMessageInput}
+                  onSend={handleSendMessage}
+                  onFileSelect={handleFileSelect}
+                />
               </div>
-              <MessageInput
-                value={messageInput}
-                onChange={setMessageInput}
-                onSend={handleSendMessage}
-                onFileSelect={handleFileSelect}
-              />
-            </div>
-          ) : (
-            <EmptyState onNewChat={() => setSelectedChatId(1)} />
-          )}
-          <SendMoneyModal
-            show={showSendMoney}
-            onClose={() => setShowSendMoney(false)}
-          />
+            ) : (
+              <EmptyState onNewChat={() => setSelectedChatId(1)} />
+            )}
+            <SendMoneyModal
+              show={showSendMoney}
+              onClose={() => setShowSendMoney(false)}
+            />
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 };

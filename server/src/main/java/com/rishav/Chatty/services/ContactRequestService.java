@@ -1,12 +1,15 @@
 package com.rishav.Chatty.services;
 
 import com.rishav.Chatty.dto.ContactRequestDTO;
+import com.rishav.Chatty.dto.NotificationDTO;
 import com.rishav.Chatty.entities.Contact;
 import com.rishav.Chatty.entities.ContactRequest;
+import com.rishav.Chatty.entities.Notification;
 import com.rishav.Chatty.entities.Users;
 import com.rishav.Chatty.enums.Status;
 import com.rishav.Chatty.repo.ContactRepo;
 import com.rishav.Chatty.repo.ContactRequestRepo;
+import com.rishav.Chatty.repo.NotificationRepo;
 import com.rishav.Chatty.repo.UsersRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,8 @@ public class ContactRequestService {
 
     @Autowired
     private ContactRepo contactRepository;
+    @Autowired
+    private NotificationRepo notificationRepository;
 
     /**
      * Handles sending a contact request by storing it in the database and sending a WebSocket notification.
@@ -54,14 +59,29 @@ public class ContactRequestService {
         request.setReceiver(receiver);
         request.setStatus(Status.PENDING);
         request.setRequestedAt(LocalDateTime.now());
-
         contactRequestRepository.save(request);
+
+        // ✅ Save notification to DB
+        Notification notification = new Notification();
+        notification.setReceiver(receiver);
+        notification.setMessage(String.format("You received a contact request from %s", sender.getUsername()));
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setRead(false);
+        notification= notificationRepository.save(notification);
+
+
+        NotificationDTO notificationDTO=new NotificationDTO();
+        notificationDTO.setId(notification.getId());
+        notificationDTO.setMessage(notification.getMessage());
+        notificationDTO.setCreatedAt(notification.getCreatedAt());
+        notificationDTO.setRead(false);
+
 
         // Notify the receiver via WebSocket
         messagingTemplate.convertAndSendToUser(
                 receiver.getEmail(),
                 "/queue/notifications",
-                String.format("You received a contact request from %s", sender.getUsername())
+                notificationDTO
         );
 
         return "Contact request sent.";
@@ -83,18 +103,18 @@ public class ContactRequestService {
         Users sender = request.getSender();
         Users receiver = request.getReceiver();
 
-        // Check if contact already exists in either direction
+        // Check if contact already exists
         boolean alreadyExists = contactRepository.existsByOwnerAndContact(sender, receiver)
                 || contactRepository.existsByOwnerAndContact(receiver, sender);
 
         if (alreadyExists) {
-            request.setStatus(Status.ACCEPTED); // Still mark as accepted
+            request.setStatus(Status.ACCEPTED);
             contactRequestRepository.save(request);
             contactRequestRepository.delete(request);
             return "You are already contacts.";
         }
 
-        // Save contacts both ways (bi-directional)
+        // Save contacts both ways
         Contact contactForSender = new Contact();
         contactForSender.setOwner(sender);
         contactForSender.setContact(receiver);
@@ -109,9 +129,22 @@ public class ContactRequestService {
         // Update request status
         request.setStatus(Status.ACCEPTED);
         contactRequestRepository.save(request);
-
-        // Optionally delete the request to clean up
         contactRequestRepository.delete(request);
+
+        // ✅ Save notification to DB
+        Notification notification = new Notification();
+        notification.setReceiver(sender);  // Notify the one who SENT the request
+        notification.setMessage(receiver.getUsername() + " accepted your contact request.");
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setRead(false);
+        notificationRepository.save(notification);
+
+        // 📣 Send WebSocket notification to sender
+        messagingTemplate.convertAndSendToUser(
+                sender.getEmail(),
+                "/queue/notifications",
+                notification
+        );
 
         return "Contact request accepted. You are now contacts!";
     }
