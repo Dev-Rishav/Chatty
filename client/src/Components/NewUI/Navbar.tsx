@@ -1,13 +1,14 @@
 import { BellIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
 import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 const Navbar: React.FC = () => {
   const { userDTO } = useAppSelector((state: RootState) => state.auth);
   const [showNotifications, setShowNotifications] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null); // reference to the dropdown
-
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
   const notificationCount = 4;
 
   const notifications = [
@@ -16,33 +17,50 @@ const Navbar: React.FC = () => {
     { id: 3, text: "Group chat updated: 3 new messages in 'Design Team'", read: false },
   ];
 
-  // Detect click outside dropdown
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT" });
+    localStorage.removeItem("userDTO");
+    localStorage.removeItem("authToken");
+    toast.success("Logged out successfully");
+  }
+
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
         setShowNotifications(false);
       }
+    };
+
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [showNotifications]);
 
   return (
     <nav className="bg-gradient-to-b from-amber-50 to-transparent px-6 py-4 backdrop-blur-sm relative z-40">
       <div className="flex justify-between items-center max-w-7xl mx-auto">
+        {/* Logo */}
         <div className="flex items-center space-x-3">
           <span className="text-2xl font-playfair text-amber-900">Chatty</span>
           <span className="text-amber-700 text-xl">✉️</span>
         </div>
 
+        {/* Right Section */}
         <div className="flex items-center space-x-4">
-          <div className="relative" ref={dropdownRef}>
+          {/* Notifications */}
+          <div className="relative" ref={notificationRef}>
             <button
               className="p-2 hover:bg-amber-100/50 rounded-full transition-colors relative"
-              onClick={() => setShowNotifications((prev) => !prev)}
+              onClick={() => setShowNotifications(!showNotifications)}
             >
               <BellIcon className="w-6 h-6 text-amber-700" />
               {notificationCount > 0 && (
@@ -86,6 +104,7 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
+          {/* User Profile + Logout */}
           <div className="flex items-center space-x-3">
             <button className="hover:bg-amber-100/50 rounded-full transition-colors">
               {userDTO?.profilePic ? (
@@ -103,6 +122,12 @@ const Navbar: React.FC = () => {
             <span className="font-crimson text-amber-900 text-base hidden md:block">
               {userDTO?.username}
             </span>
+            <button
+              onClick={handleLogout}
+              className="ml-2 bg-amber-100 hover:bg-amber-200 text-amber-900 text-sm px-3 py-1 rounded-lg font-semibold font-crimson transition"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
