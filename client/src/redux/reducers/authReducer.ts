@@ -11,7 +11,7 @@ import {
   interface UserDTO {
     username: string;
     email: string;
-    ProfilePic?:string;
+    profilePic?:string;
   }
   
   interface AuthState {

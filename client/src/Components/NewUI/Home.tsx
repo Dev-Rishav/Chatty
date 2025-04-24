@@ -27,6 +27,7 @@ import uploadFile from "../../utility/uploadFile";
 import { useAppDispatch } from "../../redux/hooks";
 import { updateUserPresence } from "../../redux/actions/presenceActions";
 import ChatList from "./ChatList";
+import Navbar from "./Navbar";
 
 const HomePage: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
@@ -189,8 +190,12 @@ const HomePage: React.FC = () => {
     setSelectedFile(file);
   };
 
+  console.log("curent user", userDTO);
+  
 
   return (
+    <>
+    <Navbar />
     <div
       className="min-h-screen bg-[#f5f1e8]"
       style={{ backgroundImage: `url(${bg2})` }}
@@ -282,6 +287,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

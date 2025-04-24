@@ -197,3 +197,12 @@
   .shadow-paper-deep {
     box-shadow: 8px 8px 0 rgba(94, 71, 32, 0.15);
   }
+
+
+  .paper-button {
+    padding: 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background: #f5f1e8;
+    border: 1px solid #e5d9c3;
+  }
