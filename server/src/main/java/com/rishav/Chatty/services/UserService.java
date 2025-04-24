@@ -102,4 +102,9 @@ public class UserService {
         }
         return allUsersDTO;
     }
+
+
+    public Users findByEmail(String receiverEmail) {
+        return repo.findByEmail(receiverEmail);
+    }
 }
