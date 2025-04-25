@@ -3,13 +3,15 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { fetchNotificationHistory } from "../../redux/actions/notificationActions";
 
 const Navbar: React.FC = () => {
   const { userDTO } = useAppSelector((state: RootState) => state.auth);
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
-  const notificationCount = 4;
+  const notificationArray=useAppSelector((state: RootState) => state.notifications.list);
+  const notificationCount = notificationArray.length;
 
   const notifications = [
     { id: 1, text: "New message from Alice: 'Let's finalize the design mockups'", read: false },
@@ -17,13 +19,18 @@ const Navbar: React.FC = () => {
     { id: 3, text: "Group chat updated: 3 new messages in 'Design Team'", read: false },
   ];
 
+  useEffect(() => {
+    dispatch(fetchNotificationHistory());
+  }, [dispatch]);
+
+  //handle logout
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
     localStorage.removeItem("userDTO");
     localStorage.removeItem("authToken");
     toast.success("Logged out successfully");
   }
-
+  // Close notifications when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -76,7 +83,7 @@ const Navbar: React.FC = () => {
                   Notifications
                 </div>
                 <div className="max-h-96 overflow-y-auto">
-                  {notifications.length > 0 ? (
+                  {notificationArray.length > 0 ? (
                     notifications.map((notification) => (
                       <div
                         key={notification.id}

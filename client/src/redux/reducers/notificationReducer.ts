@@ -1,10 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Notification } from "../../interfaces/types";
 
-export interface Notification {
-  id: string;
-  text: string;
-  read: boolean;
-}
+
 
 interface NotificationState {
   list: Notification[];
@@ -28,10 +25,13 @@ export const notificationSlice = createSlice({
     clearNotifications: (state) => {
       state.list = [];
     },
+    setNotifications: (state, action: PayloadAction<Notification[]>) => {
+      state.list = action.payload;
+    },
   },
 });
 
-export const { addNotification, markAsRead, clearNotifications } =
+export const { addNotification, markAsRead, clearNotifications,setNotifications } =
   notificationSlice.actions;
 
 export const notificationReducer = notificationSlice.reducer;

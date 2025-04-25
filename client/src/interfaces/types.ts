@@ -34,3 +34,9 @@ export interface UserDTO{
   username:string
   profilePic?:string
 }
+
+export interface Notification {
+  id: string;
+  text: string;
+  read: boolean;
+}

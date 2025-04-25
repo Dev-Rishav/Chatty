@@ -29,6 +29,7 @@ import { updateUserPresence } from "../../redux/actions/presenceActions";
 import ChatList from "./ChatList";
 import Navbar from "./Navbar";
 import { addNotification } from "../../redux/reducers/notificationReducer";
+import SideBarHeader from "./SideBarHeader";
 
 const HomePage: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
@@ -226,27 +227,8 @@ const HomePage: React.FC = () => {
           {/* Left Sidebar */}
           <div className="w-96 pr-4 py-6 flex flex-col">
             <div className="paper-container p-6 rounded-sm flex-1 flex flex-col shadow-paper">
-              <div className="flex items-center justify-between mb-8 border-b border-amber-900/20 pb-4">
-                <h1 className="text-3xl tracking-wide font-playfair font-bold text-amber-900">
-                  Chatty
-                  <span className="text-amber-700 text-2xl ml-2">🕊️</span>
-                </h1>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setIsDarkMode(!isDarkMode)}
-                    className="paper-button p-2"
-                  >
-                    {isDarkMode ? (
-                      <SunIcon className="w-6 h-6 text-amber-700" />
-                    ) : (
-                      <MoonIcon className="w-6 h-6 text-amber-700" />
-                    )}
-                  </button>
-                  <button className="paper-button">
-                    <PlusCircleIcon className="w-7 h-7 text-amber-700" />
-                  </button>
-                </div>
-              </div>
+              {/* Left Top */}
+              <SideBarHeader isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
               {/* Left Mid */}
               <ChatList
