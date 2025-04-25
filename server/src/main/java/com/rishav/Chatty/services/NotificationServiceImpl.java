@@ -5,6 +5,9 @@ import com.rishav.Chatty.repo.NotificationRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -17,4 +20,5 @@ public class NotificationServiceImpl implements NotificationService {
     public List<Notification> getNotificationsForUser(String userEmail) {
         return notificationRepository.findByReceiverEmailOrderByCreatedAtDesc(userEmail);
     }
+
 }
