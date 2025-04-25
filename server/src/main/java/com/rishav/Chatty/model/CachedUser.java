@@ -1,16 +1,13 @@
 package com.rishav.Chatty.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.annotation.Id;
 
 @RedisHash("User")
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
 public class CachedUser {
     @Id

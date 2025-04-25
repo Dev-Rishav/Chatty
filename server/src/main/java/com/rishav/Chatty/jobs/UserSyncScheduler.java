@@ -11,8 +11,8 @@ public class UserSyncScheduler {
     @Autowired
     private UserSyncService userSyncService;
 
-    // Runs every 10 minutes 
-    @Scheduled(cron = "0 */10 * * * *")
+    // Runs every 10 minutes
+    @Scheduled(cron = "0 * * * * *")
     public void scheduledUserSync() {
         System.out.println("🔄 Starting user sync to Redis...");
         userSyncService.syncUsersToRedis();
