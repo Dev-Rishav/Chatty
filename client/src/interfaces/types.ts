@@ -27,3 +27,16 @@ export interface Chat {
   online?: boolean;
   profilePic?: string;
 }
+
+export interface UserDTO{
+  user_id:number;
+  email:string;
+  username:string
+  profilePic?:string
+}
+
+export interface Notification {
+  id: string;
+  text: string;
+  read: boolean;
+}

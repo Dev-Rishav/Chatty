@@ -12,17 +12,13 @@ import {
 import { AppDispatch, persistor } from '../store';
 import { setInitialOnlineUsers, updateUserPresence } from './presenceActions';
 import stompService from '../../services/stompService';
+import {UserDTO} from '../../interfaces/types'
 
 interface Credentials {
   email: string;
   password: string;
 }
 
-interface UserDTO {
-  username: string;
-  name?: string;
-  email: string;
-}
 
 interface LoginResponse {
   userDTO: UserDTO;

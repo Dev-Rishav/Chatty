@@ -10,9 +10,6 @@ import store from './redux/store';
 import AuthStatus from './redux/AuthStatus';
 import PrivateRoute from './redux/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
-import Test from './Components/Test';
-import Test2 from './Components/Test2';
-import HomePage from './pages/HomePage';
 import Home from './Components/NewUI/Home';
 
 const App: React.FC = () => {
@@ -21,7 +18,6 @@ const App: React.FC = () => {
       <PersistGate loading={null} persistor={persistor}>
         <Router>
           <Toaster />
-          <AuthStatus />
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<Auth />} />
