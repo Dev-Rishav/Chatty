@@ -214,7 +214,7 @@ const HomePage: React.FC = () => {
     setSelectedFile(file);
   };
 
-  console.log("curent user", userDTO);
+  // console.log("curent user", userDTO);
 
   return (
     <>

@@ -25,25 +25,35 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
   const [userResults, setUserResults] = useState<UserDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const token = useAppSelector((state) => state.auth.token);
-  if (!token) {
+  const {token,userDTO} = useAppSelector((state) => state.auth);
+  const currentUserEmail = userDTO?.email;
+  if (!token || !currentUserEmail) {
     return <div className="text-amber-700">Please log in to go further.</div>;
   }
 
+  // Effect to fetch users based on search term
   useEffect(() => {
     const searchUsers = async () => {
       try {
         setLoading(true);
         setError("");
         const users = await fetchUsersBySearch(searchTerm, token);
-        setUserResults(users);
+        
+
+        // Filter out current user from results
+        const filteredUsers = users.filter(user => 
+          user.email?.toLowerCase() !== currentUserEmail?.toLowerCase()
+        );
+        
+        setUserResults(filteredUsers);
       } catch (err) {
         setError("Failed to search users. Please try again.");
+        console.error("Error fetching users:", err);
       } finally {
         setLoading(false);
       }
     };
-
+  
     const debounceTimer = setTimeout(() => {
       if (searchTerm.trim() && token) {
         searchUsers();
@@ -51,7 +61,7 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
         setUserResults([]);
       }
     }, 300);
-
+  
     return () => clearTimeout(debounceTimer);
   }, [searchTerm, token]);
 
