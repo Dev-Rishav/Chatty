@@ -9,7 +9,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { useAppSelector } from "../../redux/hooks";
 import { fetchUsersBySearch } from "../../utility/fetchUsers";
-import { UserDTO } from "../../interfaces/types";
+import { ContactRequestDTO, UserDTO } from "../../interfaces/types";
+import stompService from "../../services/stompService";
+import toast from "react-hot-toast";
 
 interface SideBarHeaderProps {
   isDarkMode: boolean;
@@ -25,7 +27,7 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
   const [userResults, setUserResults] = useState<UserDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const {token,userDTO} = useAppSelector((state) => state.auth);
+  const { token, userDTO } = useAppSelector((state) => state.auth);
   const currentUserEmail = userDTO?.email;
   if (!token || !currentUserEmail) {
     return <div className="text-amber-700">Please log in to go further.</div>;
@@ -38,13 +40,13 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
         setLoading(true);
         setError("");
         const users = await fetchUsersBySearch(searchTerm, token);
-        
 
         // Filter out current user from results
-        const filteredUsers = users.filter(user => 
-          user.email?.toLowerCase() !== currentUserEmail?.toLowerCase()
+        const filteredUsers = users.filter(
+          (user) =>
+            user.email?.toLowerCase() !== currentUserEmail?.toLowerCase()
         );
-        
+
         setUserResults(filteredUsers);
       } catch (err) {
         setError("Failed to search users. Please try again.");
@@ -53,7 +55,7 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
         setLoading(false);
       }
     };
-  
+
     const debounceTimer = setTimeout(() => {
       if (searchTerm.trim() && token) {
         searchUsers();
@@ -61,7 +63,7 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
         setUserResults([]);
       }
     }, 300);
-  
+
     return () => clearTimeout(debounceTimer);
   }, [searchTerm, token]);
 
@@ -70,6 +72,22 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
     setSearchTerm("");
     setUserResults([]);
     setError("");
+  };
+
+  const handleSendRequest = async (receiverEmail:string) => {
+    try {
+      const contactRequest: ContactRequestDTO = {
+        senderEmail: currentUserEmail,
+        receiverEmail: receiverEmail,
+      };
+      stompService.connect(token, () => {
+        stompService.sendContactRequest(contactRequest);
+      });
+
+      toast.success("Request sent successfully!");
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+    }
   };
 
   return (
@@ -215,6 +233,7 @@ const SideBarHeader: React.FC<SideBarHeaderProps> = ({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="paper-button px-3 py-1 text-sm hover:bg-amber-200/50"
+                        onClick={() => handleSendRequest(user.email)}
                       >
                         Add
                       </motion.button>

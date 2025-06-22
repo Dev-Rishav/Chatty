@@ -84,19 +84,19 @@ const Navbar: React.FC = () => {
                 </div>
                 <div className="max-h-96 overflow-y-auto">
                   {notificationArray.length > 0 ? (
-                    notifications.map((notification) => (
+                    notificationArray.map((notification) => (
                       <div
                         key={notification.id}
                         className={`p-4 text-base font-crimson transition-colors ${
-                          !notification.read ? "bg-amber-100/50" : "bg-transparent"
+                          !notification.isRead ? "bg-amber-100/50" : "bg-transparent"
                         } hover:bg-amber-100 border-b border-amber-100 last:border-b-0`}
                       >
                         <div className="flex items-center space-x-3">
-                          {!notification.read && (
+                          {!notification.isRead && (
                             <div className="w-3 h-3 bg-amber-600 rounded-full flex-shrink-0" />
                           )}
-                          <span className={!notification.read ? "text-amber-900" : "text-amber-700/80"}>
-                            {notification.text}
+                          <span className={!notification.isRead ? "text-amber-900" : "text-amber-700/80"}>
+                            {notification.message}
                           </span>
                         </div>
                       </div>
