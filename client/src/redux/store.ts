@@ -13,7 +13,7 @@ import {
   REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage
-import { notificationReducer } from './reducers/notificationReducer';
+import  notificationReducer  from './reducers/notificationReducer';
 
 const rootReducer = combineReducers({
   auth: authReducer,

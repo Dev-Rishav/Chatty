@@ -1,13 +1,10 @@
 import axios from "axios";
+import { Notification } from "../../interfaces/types";
+import { ADD_NOTIFICATION, CLEAR_NOTIFICATIONS, MARK_AS_READ, SET_NOTIFICATIONS } from "./notificationActionTypes";
 
-// Action Types
-export const ADD_NOTIFICATION = "ADD_NOTIFICATION";
-export const MARK_AS_READ = "MARK_AS_READ";
-export const CLEAR_NOTIFICATIONS = "CLEAR_NOTIFICATIONS";
-export const SET_NOTIFICATIONS = "SET_NOTIFICATIONS";
 
 // Action Creators
-export const addNotification = (notification: any) => ({
+export const addNotification = (notification: Notification[]) => ({
   type: ADD_NOTIFICATION,
   payload: notification,
 });
@@ -21,7 +18,7 @@ export const clearNotifications = () => ({
   type: CLEAR_NOTIFICATIONS,
 });
 
-export const setNotifications = (notifications: any[]) => ({
+export const setNotifications = (notifications: Notification[]) => ({
   type: SET_NOTIFICATIONS,
   payload: notifications,
 });
@@ -30,7 +27,7 @@ export const setNotifications = (notifications: any[]) => ({
 export const fetchNotificationHistory = () => {
   return async (dispatch: any, getState: any) => {
     try {
-      const token = getState().auth.token; // adjust path if needed
+      const token = getState().auth.token;
       const response = await axios.get("http://localhost:8080/api/notifications", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -41,8 +38,8 @@ export const fetchNotificationHistory = () => {
         throw new Error("Failed to fetch notifications");
       }
 
-      const data = await response.data;
-      console.log("notifications",data);
+      const data:Notification[] =  response.data;
+      // console.log("notifications",data);
       
       dispatch(setNotifications(data));
     } catch (error) {

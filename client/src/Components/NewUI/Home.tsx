@@ -16,7 +16,7 @@ import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
 import EmptyState from "./EmptyState";
 import SendMoneyModal from "./SendMoneyModal";
-import { Chat, Message } from "../../interfaces/types";
+import { Chat, Message, Notification } from "../../interfaces/types";
 import fetchAllChats from "../../utility/fetchAllChats";
 import { useSelector } from "react-redux";
 import store, { RootState } from "../../redux/store";
@@ -24,12 +24,12 @@ import fetchAllMessages from "../../utility/fetchAllMessages";
 import stompService from "../../services/stompService";
 import toast from "react-hot-toast";
 import uploadFile from "../../utility/uploadFile";
-import { useAppDispatch } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { updateUserPresence } from "../../redux/actions/presenceActions";
 import ChatList from "./ChatList";
 import Navbar from "./Navbar";
-import { addNotification } from "../../redux/reducers/notificationReducer";
 import SideBarHeader from "./SideBarHeader";
+import { addNotification } from "../../redux/actions/notificationActions";
 
 const HomePage: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
@@ -188,12 +188,18 @@ const HomePage: React.FC = () => {
     stompService.connect(token, () => {
       // subscribe to notifications topic
       stompService.subscribe("/user/queue/notifications", (payload) => {
+        const notification:Notification[]= useAppSelector(
+          (state: RootState) => state.notifications.list
+        );
+        notification.push({
+          id: payload.id || Date.now().toString(),
+          message: payload.message || "New Notification",
+          isRead: payload.read || false,
+          createdAt: payload.createdAt || new Date().toISOString(),
+        })
+        toast.success(`🔔 ${payload.message} `);
         dispatch(
-          addNotification({
-            id: payload.id || Date.now().toString(),
-            text: payload.message || "New Notification",
-            read: payload.read || false,
-          })
+          addNotification(notification)
         );
       });
     });
